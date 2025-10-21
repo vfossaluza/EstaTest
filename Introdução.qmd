@@ -1,0 +1,96 @@
+---
+title: "Introdução"
+author: "Gabriela Scarpini"
+format: html
+editor: visual
+---
+
+## Função de verossimilhança 
+
+Seja $X = (x_1, x_2, \cdots, x_n)$ uma amostra aleatória (ou seja, i.i.d.), com distribuição de probabilidade $f(x| \theta), \, \theta \in \Theta$. A função de verossimilhanã é dada por:
+
+$$
+V_x(\theta) = \prod^{n}_{i=1} f(x_i | \theta)
+$$
+
+**Exemplo:**
+
+Seja $X_1, X_2, \cdots, X_n$ a.a. com $X \sim \text{Exp}(\theta), \, \theta \in \Theta$ . A função de verossimilhança é
+
+$$
+V_x(\theta) = \prod^{n}_{i=1} f(x_i | \theta) = \prod^{n}_{i=1} \theta \, e^{\theta -x_i} = \theta^n \, e^{\theta \, \cdot \sum^n_{i=1} x_i}
+$$
+
+## Estimador de máxima verossimilhança
+
+O estimador de de máximo verossimilhança $\hat{\theta}$ é o valor que maximiza nossa função $V_x(\theta)$. Ou seja, é o valor de $\theta$ que torna os dados observados o mais provável possível.
+
+Uma vez que, $V_x(\theta) > 0, \, \forall \, \theta \in \Theta$ podemos usar a função de log-verossimilhança ($\ell(\theta) = ln(V_x(\theta))$) para encontrar o $\hat{\theta}$, uma vez que ela é crescente e ajuda a simplificar os cálculos.
+
+**Exemplo:**
+
+Seja $X_1, X_2, \cdots, X_n$ a.a. com $X \sim \text{Exp}(\theta), \, \theta \in \Theta$ . Queremos encontrar o estimador de máxima verossimilhança.
+
+Aplicando $ln$ em $V_x(\theta)$:
+
+$$
+\ell(\theta) = ln(\theta^n \, e^{\theta \, \cdot \sum^n_{i=1} x_i})
+= n \cdot ln(\theta) + \theta \sum^n_{i=1} x_i
+$$
+
+Encontrando o máximo:
+
+$$
+\frac{d\ell}{d\theta} \Big|_{\theta = \hat{\theta}} = 0 \Leftrightarrow 
+\frac{n}{\hat{\theta}} + \sum_{i=1}^n x_i = 0 \Leftrightarrow \hat{\theta} = - \frac{n}{\sum_{i=1}^n x_i}
+$$
+
+## Teste de Hipótese
+
+O Teste de Hipótese nos ajudam a decidir se os dados da amostra suportam ou refutam uma afirmação sobre a população.
+
+A hipótese nula $H_0$ é a afirmação inícial que buscamos evidências para rejeitar. A hipótese alternativa $H_1$ é o que se quer provar.
+
+## O que é uma estatística de teste de hipotese
+
+## Razão de verossimilhança
+
+## Estatística suficiente
+
+## Exercício fossaluza
+
+Seja $X_1, X_2, \cdots, X_n$ $c.i.i.d$ (condicionalmente idependentes e identicamente distribuídos), com $X_i | \theta \sim Exp(\theta)$ .
+
+Nossas hipóteses são:
+
+$H_0: \theta \leq 1$
+
+$H_1: \theta > 1$
+
+Temos duas amostras:
+
+-   Amostra 1: $n = 2 \text{ e } \sum_{i=1}^n x_i = 1$
+
+-   Amostra 2: $n = 2 \text{ e } \sum_{i=1}^n x_i = 3$
+
+Calcular a estatística de razão de verossimilhança generalizada $\lambda(x)$ para as duas amostras.
+
+$$
+\lambda(x) = \frac{\displaystyle \sup_{\theta \leq 1} f(x|\theta)}{\displaystyle \sup_{\theta} f(x|\theta)}
+$$
+
+**Resolução:**
+
+Amostra 1:
+
+Para o primeiro caso temos a razão de verossimilhança:
+
+$$
+V(x) = \theta^2 e^{-\theta}
+$$
+
+Amostra 2:
+
+Para o primeiro caso temos a razão de verossimilhança:
+
+$$ V(x) = \theta^2 e^{-3\theta} $$
