@@ -109,9 +109,15 @@ V_x(\theta) = \prod^{n}_{i=1} f(x_i | \theta)
 <p><span class="math display">\[
 V_x(\theta) = \prod^{n}_{i=1} f(x_i | \theta) = \prod^{n}_{i=1} \theta \, e^{\theta -x_i} = \theta^n \, e^{\theta \, \cdot \sum^n_{i=1} x_i}
 \]</span></p>
+<hr>
 </section>
-<section id="estimador-de-máxima-verossimilhança" class="level2">
-<h2 class="anchored" data-anchor-id="estimador-de-máxima-verossimilhança">Estimador de máxima verossimilhança</h2>
+<section id="teorema-de-finetti" class="level2">
+<h2 class="anchored" data-anchor-id="teorema-de-finetti">Teorema de Finetti</h2>
+<p>Se <span class="math inline">\(X_1, \cdots, X_n\)</span> são permutáveis então <span class="math inline">\(\exists\)</span> <span class="math inline">\(\theta\)</span> (variável aleatória), tal que, dado <span class="math inline">\(\theta\)</span>, <span class="math inline">\(X_1, \cdots, X_n\)</span> são i.i.d.</p>
+<hr>
+</section>
+<section id="estimador-de-máxima-verossimilhança-emv" class="level2">
+<h2 class="anchored" data-anchor-id="estimador-de-máxima-verossimilhança-emv">Estimador de máxima verossimilhança (EMV)</h2>
 <p>O estimador de de máximo verossimilhança <span class="math inline">\(\hat{\theta}\)</span> é o valor que maximiza nossa função <span class="math inline">\(V_x(\theta)\)</span>. Ou seja, é o valor de <span class="math inline">\(\theta\)</span> que torna os dados observados o mais provável possível.</p>
 <p>Uma vez que, <span class="math inline">\(V_x(\theta) &gt; 0, \, \forall \, \theta \in \Theta\)</span> podemos usar a função de log-verossimilhança (<span class="math inline">\(\ell(\theta) = ln(V_x(\theta))\)</span>) para encontrar o <span class="math inline">\(\hat{\theta}\)</span>, uma vez que ela é crescente e ajuda a simplificar os cálculos.</p>
 <p><strong>Exemplo:</strong></p>
@@ -126,20 +132,50 @@ V_x(\theta) = \prod^{n}_{i=1} f(x_i | \theta) = \prod^{n}_{i=1} \theta \, e^{\th
 \frac{d\ell}{d\theta} \Big|_{\theta = \hat{\theta}} = 0 \Leftrightarrow
 \frac{n}{\hat{\theta}} + \sum_{i=1}^n x_i = 0 \Leftrightarrow \hat{\theta} = - \frac{n}{\sum_{i=1}^n x_i}
 \]</span></p>
+<hr>
+</section>
+<section id="estatística-suficiente" class="level2">
+<h2 class="anchored" data-anchor-id="estatística-suficiente">Estatística suficiente</h2>
+<p>Uma estatística <span class="math inline">\(T(X_1, \cdots, X_n)\)</span> é suficiente para <span class="math inline">\(\theta\)</span> se a função de verossimilhança puder ser escrita assim:</p>
+<p><span class="math display">\[
+f(x_1, \cdots, x_n | \theta) = u(T(x_1, \cdots, x_n), \theta) v(x)
+\]</span></p>
+<p>Onde: - <span class="math inline">\(u(T(x_1, \cdots, x_n)\)</span> depende de <span class="math inline">\(\theta\)</span>. - <span class="math inline">\(v(x)\)</span> não depende de <span class="math inline">\(\theta\)</span></p>
+<p><strong>Exemplo:</strong></p>
+<p>Seja <span class="math inline">\((X_1, \cdots, X_n)\)</span> a.a com <span class="math inline">\(X \sim Poisson(\theta)\)</span>, temos:</p>
+<p><span class="math display">\[
+f(x_1, \cdots, x_n | \theta) =  \prod_{i=1}^n \frac{e^{-\theta} \lambda^{x_i}}{x_i!} \\
+= e^{-n\theta} \lambda^{\sum_{i=1}^n x_i} \prod_{i=1}^n \frac{1}{x_i!}
+\]</span> Podemos reescrever:</p>
+<p><span class="math display">\[
+f(x_1, \cdots, x_n | \theta) = e^{-n\theta} \lambda^T \prod_{i=1}^n \frac{1}{x_i!}
+\]</span></p>
+<p>Com <span class="math display">\[
+T(X_1, \cdots, X_n) = \sum_{i=1}^n x_i
+\]</span> Ou seja, nesse exemplo: <span class="math display">\[
+u(T(x_1, \cdots, x_n) = e^{-n\theta} \lambda^T \\
+v(x) = \prod_{i=1}^n \frac{1}{x_i!}
+\]</span></p>
+<p>Desse modo, <span class="math inline">\(T(X_1, \cdots, X_n) = \sum_{i=1}^n x_i\)</span> é suficiente para <span class="math inline">\(\theta\)</span>.</p>
+<hr>
 </section>
 <section id="teste-de-hipótese" class="level2">
 <h2 class="anchored" data-anchor-id="teste-de-hipótese">Teste de Hipótese</h2>
 <p>O Teste de Hipótese nos ajudam a decidir se os dados da amostra suportam ou refutam uma afirmação sobre a população.</p>
 <p>A hipótese nula <span class="math inline">\(H_0\)</span> é a afirmação inícial que buscamos evidências para rejeitar. A hipótese alternativa <span class="math inline">\(H_1\)</span> é o que se quer provar.</p>
+<hr>
 </section>
-<section id="o-que-é-uma-estatística-de-teste-de-hipotese" class="level2">
-<h2 class="anchored" data-anchor-id="o-que-é-uma-estatística-de-teste-de-hipotese">O que é uma estatística de teste de hipotese</h2>
+<section id="estatística-de-teste-de-hipotese" class="level2">
+<h2 class="anchored" data-anchor-id="estatística-de-teste-de-hipotese">Estatística de teste de hipotese</h2>
+<p>Uma estatística de teste é uma função usada para tomar uma decisão de um teste de hipótese.</p>
+<p>Um exemplo disso é a <strong>estatística de razão de verossimilhança</strong>, que é a razão da EMV da hipótese nula sobre a EMV do espaço paramétrico: <span class="math display">\[
+\lambda(x) = \frac{\displaystyle \sup_{\theta \leq 1} f(x|\theta)}{\displaystyle \sup_{\theta} f(x|\theta)}
+\]</span></p>
+<hr>
 </section>
-<section id="razão-de-verossimilhança" class="level2">
-<h2 class="anchored" data-anchor-id="razão-de-verossimilhança">Razão de verossimilhança</h2>
-</section>
-<section id="estatística-suficiente" class="level2">
-<h2 class="anchored" data-anchor-id="estatística-suficiente">Estatística suficiente</h2>
+<section id="lema-de-neyman-pearson" class="level2">
+<h2 class="anchored" data-anchor-id="lema-de-neyman-pearson">Lema de Neyman Pearson</h2>
+<hr>
 </section>
 <section id="exercício-fossaluza" class="level2">
 <h2 class="anchored" data-anchor-id="exercício-fossaluza">Exercício fossaluza</h2>

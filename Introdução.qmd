@@ -20,8 +20,15 @@ Seja $X_1, X_2, \cdots, X_n$ a.a. com $X \sim \text{Exp}(\theta), \, \theta \in 
 $$
 V_x(\theta) = \prod^{n}_{i=1} f(x_i | \theta) = \prod^{n}_{i=1} \theta \, e^{\theta -x_i} = \theta^n \, e^{\theta \, \cdot \sum^n_{i=1} x_i}
 $$
+---
 
-## Estimador de máxima verossimilhança
+## Teorema de Finetti 
+
+Se $X_1, \cdots, X_n$ são permutáveis então $\exists$ $\theta$ (variável aleatória), tal que, dado $\theta$, $X_1, \cdots, X_n$ são i.i.d.
+
+---
+
+## Estimador de máxima verossimilhança (EMV)
 
 O estimador de de máximo verossimilhança $\hat{\theta}$ é o valor que maximiza nossa função $V_x(\theta)$. Ou seja, é o valor de $\theta$ que torna os dados observados o mais provável possível.
 
@@ -45,17 +52,70 @@ $$
 \frac{n}{\hat{\theta}} + \sum_{i=1}^n x_i = 0 \Leftrightarrow \hat{\theta} = - \frac{n}{\sum_{i=1}^n x_i}
 $$
 
+---
+
+## Estatística suficiente
+
+Uma estatística $T(X_1, \cdots, X_n)$ é suficiente para $\theta$ se a função de verossimilhança puder ser escrita assim:
+
+$$
+f(x_1, \cdots, x_n | \theta) = u(T(x_1, \cdots, x_n), \theta) v(x)
+$$
+
+Onde:
+- $u(T(x_1, \cdots, x_n)$ depende de $\theta$.
+- $v(x)$ não depende de $\theta$
+
+**Exemplo:**
+
+Seja $(X_1, \cdots, X_n)$ a.a com $X \sim Poisson(\theta)$, temos:
+
+$$
+f(x_1, \cdots, x_n | \theta) =  \prod_{i=1}^n \frac{e^{-\theta} \lambda^{x_i}}{x_i!} \\
+= e^{-n\theta} \lambda^{\sum_{i=1}^n x_i} \prod_{i=1}^n \frac{1}{x_i!}
+$$
+Podemos reescrever:
+
+$$
+f(x_1, \cdots, x_n | \theta) = e^{-n\theta} \lambda^T \prod_{i=1}^n \frac{1}{x_i!}
+$$
+
+Com 
+$$
+T(X_1, \cdots, X_n) = \sum_{i=1}^n x_i
+$$
+Ou seja, nesse exemplo:
+$$
+u(T(x_1, \cdots, x_n) = e^{-n\theta} \lambda^T \\
+v(x) = \prod_{i=1}^n \frac{1}{x_i!}
+$$
+
+Desse modo, $T(X_1, \cdots, X_n) = \sum_{i=1}^n x_i$ é suficiente para $\theta$.
+
+---
+
 ## Teste de Hipótese
 
 O Teste de Hipótese nos ajudam a decidir se os dados da amostra suportam ou refutam uma afirmação sobre a população.
 
 A hipótese nula $H_0$ é a afirmação inícial que buscamos evidências para rejeitar. A hipótese alternativa $H_1$ é o que se quer provar.
 
-## O que é uma estatística de teste de hipotese
+---
 
-## Razão de verossimilhança
+## Estatística de teste de hipotese
 
-## Estatística suficiente
+Uma estatística de teste é uma função usada para tomar uma decisão de um teste de hipótese.
+
+Um exemplo disso é a **estatística de razão de verossimilhança**, que é a razão da EMV da hipótese nula sobre a EMV do espaço paramétrico:
+$$
+\lambda(x) = \frac{\displaystyle \sup_{\theta \leq 1} f(x|\theta)}{\displaystyle \sup_{\theta} f(x|\theta)}
+$$
+
+---
+
+## Lema de Neyman Pearson
+
+---
 
 ## Exercício fossaluza
 
