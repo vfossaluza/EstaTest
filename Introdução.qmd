@@ -49,7 +49,7 @@ Encontrando o máximo:
 
 $$
 \frac{d\ell}{d\theta} \Big|_{\theta = \hat{\theta}} = 0 \Leftrightarrow 
-\frac{n}{\hat{\theta}} + \sum_{i=1}^n x_i = 0 \Leftrightarrow \hat{\theta} = - \frac{n}{\sum_{i=1}^n x_i}
+\frac{n}{\hat{\theta}} + \sum_{i=1}^n x_i = 0 \Leftrightarrow \hat{\theta} = \frac{n}{\sum_{i=1}^n x_i}
 $$
 
 ---
@@ -117,7 +117,7 @@ $$
 
 ---
 
-## Exercício fossaluza
+## Exercício
 
 Seja $X_1, X_2, \cdots, X_n$ $c.i.i.d$ (condicionalmente idependentes e identicamente distribuídos), com $X_i | \theta \sim Exp(\theta)$ .
 
@@ -141,16 +141,38 @@ $$
 
 **Resolução:**
 
-Amostra 1:
-
-Para o primeiro caso temos a razão de verossimilhança:
+Inicialmente calculamos a função de verossimilhança:
 
 $$
-V(x) = \theta^2 e^{-\theta}
+V(x) =  \prod^{n}_{i=1} f(x_i | \theta) = \prod^{n}_{i=1} \theta \, e^{\theta -x_i} =
+\theta^n e^{-\theta \sum_{i=1}^n x_i}
 $$
 
-Amostra 2:
+Encontramos o EMV:
 
-Para o primeiro caso temos a razão de verossimilhança:
+$$
+\ell(\theta) = ln(\theta^n \, e^{\theta \, \cdot \sum^n_{i=1} x_i})
+= n \cdot ln(\theta) + \theta \sum^n_{i=1} x_i \\
 
-$$ V(x) = \theta^2 e^{-3\theta} $$
+\frac{d\ell}{d\theta} \Big|_{\theta = \hat{\theta}} = 0 \Leftrightarrow 
+\frac{n}{\hat{\theta}} + \sum_{i=1}^n x_i = 0 \Leftrightarrow \hat{\theta} = \frac{n}{\sum_{i=1}^n x_i}
+$$
+
+Com isso, a razão de verossimilhança generalizada $\lambda(x)$ é
+
+$$
+\lambda(x) = \frac{\theta_0^n e^{\theta_0\sum_{i=1}^n x_i}}{\hat{\theta^n} e^{-\hat{\theta} \sum_{i=1}^n x_i}} \text{ , em que } \theta_0 \text{ satisfaz } H_0
+$$
+Para a amostra 1:
+
+$$
+\hat{\theta} = \frac{2}{1} = 2 \Rightarrow \lambda(x) = \frac{1^2 e^{-1}}{2^2 e^{-2}} = \frac{e}{4} \approx 0,679 
+$$
+
+Para a amostra 2:
+
+$$
+\hat{\theta} = \frac{2}{3} \Rightarrow \lambda(x) = \frac{(\frac{2}{3})^2 e^{2/3}}{(\frac{2}{3})^2 e^{2/3}} = 1
+$$
+
+

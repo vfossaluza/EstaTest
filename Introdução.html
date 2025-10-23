@@ -130,7 +130,7 @@ V_x(\theta) = \prod^{n}_{i=1} f(x_i | \theta) = \prod^{n}_{i=1} \theta \, e^{\th
 <p>Encontrando o máximo:</p>
 <p><span class="math display">\[
 \frac{d\ell}{d\theta} \Big|_{\theta = \hat{\theta}} = 0 \Leftrightarrow
-\frac{n}{\hat{\theta}} + \sum_{i=1}^n x_i = 0 \Leftrightarrow \hat{\theta} = - \frac{n}{\sum_{i=1}^n x_i}
+\frac{n}{\hat{\theta}} + \sum_{i=1}^n x_i = 0 \Leftrightarrow \hat{\theta} = \frac{n}{\sum_{i=1}^n x_i}
 \]</span></p>
 <hr>
 </section>
@@ -177,8 +177,8 @@ v(x) = \prod_{i=1}^n \frac{1}{x_i!}
 <h2 class="anchored" data-anchor-id="lema-de-neyman-pearson">Lema de Neyman Pearson</h2>
 <hr>
 </section>
-<section id="exercício-fossaluza" class="level2">
-<h2 class="anchored" data-anchor-id="exercício-fossaluza">Exercício fossaluza</h2>
+<section id="exercício" class="level2">
+<h2 class="anchored" data-anchor-id="exercício">Exercício</h2>
 <p>Seja <span class="math inline">\(X_1, X_2, \cdots, X_n\)</span> <span class="math inline">\(c.i.i.d\)</span> (condicionalmente idependentes e identicamente distribuídos), com <span class="math inline">\(X_i | \theta \sim Exp(\theta)\)</span> .</p>
 <p>Nossas hipóteses são:</p>
 <p><span class="math inline">\(H_0: \theta \leq 1\)</span></p>
@@ -193,14 +193,25 @@ v(x) = \prod_{i=1}^n \frac{1}{x_i!}
 \lambda(x) = \frac{\displaystyle \sup_{\theta \leq 1} f(x|\theta)}{\displaystyle \sup_{\theta} f(x|\theta)}
 \]</span></p>
 <p><strong>Resolução:</strong></p>
-<p>Amostra 1:</p>
-<p>Para o primeiro caso temos a razão de verossimilhança:</p>
+<p>Inicialmente calculamos a função de verossimilhança:</p>
 <p><span class="math display">\[
-V(x) = \theta^2 e^{-\theta}
+V(x) =  \prod^{n}_{i=1} f(x_i | \theta) = \prod^{n}_{i=1} \theta \, e^{\theta -x_i} =
+\theta^n e^{-\theta \sum_{i=1}^n x_i}
 \]</span></p>
-<p>Amostra 2:</p>
-<p>Para o primeiro caso temos a razão de verossimilhança:</p>
-<p><span class="math display">\[ V(x) = \theta^2 e^{-3\theta} \]</span></p>
+<p>Encontramos o EMV:</p>
+<p>$$ () = ln(^n , e^{, ^n_{i=1} x_i}) = n ln() + ^n_{i=1} x_i \</p>
+<p> |<em>{= } = 0 + </em>{i=1}^n x_i = 0 = $$</p>
+<p>Com isso, a razão de verossimilhança generalizada <span class="math inline">\(\lambda(x)\)</span> é</p>
+<p><span class="math display">\[
+\lambda(x) = \frac{\theta_0^n e^{\theta_0\sum_{i=1}^n x_i}}{\hat{\theta^n} e^{-\hat{\theta} \sum_{i=1}^n x_i}} \text{ , em que } \theta_0 \text{ satisfaz } H_0
+\]</span> Para a amostra 1:</p>
+<p><span class="math display">\[
+\hat{\theta} = \frac{2}{1} = 2 \Rightarrow \lambda(x) = \frac{1^2 e^{-1}}{2^2 e^{-2}} = \frac{e}{4} \approx 0,679
+\]</span></p>
+<p>Para a amostra 2:</p>
+<p><span class="math display">\[
+\hat{\theta} = \frac{2}{3} \Rightarrow \lambda(x) = \frac{(\frac{2}{3})^2 e^{2/3}}{(\frac{2}{3})^2 e^{2/3}} = 1
+\]</span></p>
 </section>
 
 </main>
