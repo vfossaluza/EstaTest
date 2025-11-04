@@ -1,0 +1,85 @@
+---
+title: "Introdução à Inferência Bayesiana"
+author: "Gabriela Scarpini"
+format: html
+editor: visual
+---
+
+## Teorema de Bayes
+
+$$
+P(X=x | Y = y) = \frac{P(X=x, Y=y)}{P(Y=y)} \\
+= \frac{P(Y=y|X=x) P(X=x)}{\sum_x P(X=x, Y=y)} \\
+= \frac{P(Y=y|X=x) P(X=x)}{\sum_i P(Y=y|X=i) P(X=i)}
+$$
+
+---
+
+## Conceitos
+
+- **Distribuição a Priori:** $f(\theta)$
+É a nossa crença inicial sobre um paramêtro $\theta$, antes de qualquer observação.
+
+- **Função de verossimilhança:** $f(x | \theta)$
+É a probabilidade de observar determinada coisa dado um $\theta$. É dada por:
+$$
+f(x | \theta) = V_x(\theta) = \prod^{n}_{i=1} f(x_i | \theta)
+$$
+
+- **Distribuição a posteriori:** $f(\theta | x)$
+É a nossa crença atualizada depois de observar a amostra
+
+---
+
+## Exemplo - Cálculo da distribuição a posteriori
+
+Seja $X_1, \cdots X_n$ uma amostra aleatória com $X_i|\theta \sim Ber(\theta)$, $\theta \in [0,1]$.
+
+Nossa priori é dada por $\theta \sim Beta(a,b)$:
+
+$$
+f(\theta) = \frac{\Gamma(a + b)}{\Gamma(a)\Gamma(b)} x^{a-1} (1-x)^{b-1}
+$$
+
+Nossa função de verossimilhança é dada por:
+
+$$
+f(x | \theta) = \prod^{n}_{i=1} f(x_i | \theta) = \prod_{i=1}^{n} \theta^{x_i} (1-\theta)^{1 - x_i} = \theta^{\sum_{i=1}^n x_i} (1-\theta)^{n - \sum_{i=1}^n x_i}
+$$
+Usando o Teorema de Bayes calculamos a distribuição a posteriori:
+
+$$
+f(\theta | x) = \frac{f(x|\theta)f(\theta)}{\int_\Theta f(x|\theta)f(\theta)d\theta} =
+\frac{\theta^{\sum x_i} (1-\theta)^{n - \sum x_i} \cdot 
+\frac{\Gamma(a + b)}{\Gamma(a)\Gamma(b)} x^{a-1} (1-\theta)^{b-1}}
+{\int_0^1 \frac{\Gamma(a + b)}{\Gamma(a)\Gamma(b)} \theta^{a+\sum x_i-1} (1-\theta)^{b+n-\sum x_i-1}d\theta}
+$$
+
+Vamos chamar de $A = a+\sum x_i$ e $B= b+n-\sum x_i$. Vamos multiplicar o numerador e o denominador por 
+
+$$
+\frac{\Gamma(A+B)}{\Gamma(A)\Gamma(B)} = \frac{\Gamma(a+b+n)}{\Gamma(a+\sum x_i)\Gamma(b+n-\sum x_i)}
+$$
+
+$$
+\Rightarrow f(\theta | x) =\frac{\theta^{a+ \sum x_i-1} (1-\theta)^{b+n-\sum x_i}\frac{\Gamma(a+b+n)}{\Gamma(a+\sum x_i)\Gamma(b+n-\sum x_i)}}{\int_0^1 \theta^{a+\sum x_i-1} (1-\theta)^{b+n-\sum x_i-1}\frac{\Gamma(a+b+n)}{\Gamma(a+\sum x_i)\Gamma(b+n-\sum x_i)}d\theta}
+$$
+
+Dessa forma o denominador se torna a integral da f.d.p de uma beta, ou seja, nosso denominador se torna 1.
+
+Por fim, nossa posteriori é
+
+$$
+\Rightarrow f(\theta | x) = \theta^{a+ \sum x_i-1} (1-\theta)^{b+n-\sum x_i}\frac{\Gamma(a+b+n)}{\Gamma(a+\sum x_i)\Gamma(b+n-\sum x_i)}
+$$
+
+Ou seja, 
+
+$$
+\theta | x \sim Beta(A, B)
+$$
+
+---
+
+
+
