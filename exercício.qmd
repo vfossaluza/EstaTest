@@ -1,0 +1,248 @@
+---
+title: "Exercício"
+format: html
+---
+
+## Enunciado
+
+Seja $X_1, \cdots X_n$ v.a. c.i.i.d tais que
+
+$X_i | \theta \sim Ber(\theta) \text{ , } n=10$
+
+$$
+T(\mathbb{x}) = \sum_{i=1}^{10} X_i | \theta \sim Bin(10, \theta)
+$$
+
+Suponha que, a priori, $\theta \sim Beta(a, b)$ (pode fixar $(a,b)$, por exemplo a=b=1, $\theta \sim Unif(0,1))$, de modo que
+
+$$
+\theta | \mathbb{X} = \mathbb{x} \sim \sum_{i=1}^{10} X_i = x \sim Beta(a+x, b+n-x)
+$$
+
+Suponha também que deseja-se testar
+
+$$
+H_0: \theta \leq \frac{1}{2}   
+$$
+
+$$
+H_1: \theta > \frac{1}{2}
+$$
+
+Observação: 
+$$
+\Theta = [0, 1] \\
+\Theta_0 = [0, \frac{1}{2}]
+$$
+
+Vamos estudar o comportamento das estatísticas de teste para cada valor de $x = \sum_{i=1}^n \in \{0, 1, \cdots, 10 \}$ (note que são todos os possíveis valores de $T(\mathbb{X})$).
+
+Para isso, vamos considerar as estatísticas de teste:
+
+($i$) RVG : 
+$$
+\lambda (x) = \frac{\displaystyle \sup_{\theta \in \Theta_0} f(x|\theta)}{\displaystyle \sup_{\theta \in \Theta} f(x|\theta)}
+$$
+
+($ii$) p-value: 
+$$
+\sup_{\theta \in \Theta_0} P(X: \lambda(\mathbb{X} \leq \lambda(x)| \theta)
+$$
+
+($iii$) $P( \theta \in \Theta_0 | \mathbb{x})$
+
+($iv$) e-value:
+
+$$
+Ev(\Theta_0 | x) = 1 - P(\theta \in T_x | x)
+$$
+
+Com
+
+$$
+ T_x = \{ \theta : f(\theta | \mathbb{x} \geq
+\sup_{\theta \in \Theta_0} f(\theta | x) \}
+$$
+
+---
+
+## Resolução
+
+Primeiro, vamos entender o problema: 
+
+Lançamos uma moeda 10 vezes.$x$ é o número de sucessos (caras). Queremos testar se a probabilidade de sucesso $\theta$ é menor ou igual a 1/2 ($H_0$) ou maior que 1/2 ($H_1$).
+
+Para cada $x$ (de 0 a 10), temos que calcular:
+
+- RVG: Razão de Verossimilhança Generalizada ($\lambda(x)$)
+
+- p-valor
+
+- $P(\theta \in \Theta_0 | x)$
+
+- e-valor
+
+No fim, criamos uma tabela com todos esses valores.
+
+
+Os parâmetros do problema são:
+
+```{r}
+n <- 10
+a <- 1 # Parâmetro da Prior Beta
+b <- 1 # Parâmetro da Prior Beta
+```
+
+Usei a sugestão do enunciado que fixar $(a,b)$, de modo que, $\theta \sim Unif(0,1))$
+
+
+**Calculando RVG:**
+
+A razão de verossimilhança é calculada por:
+
+$$
+\lambda (x) = \frac{\displaystyle \sup_{\theta \in \Theta_0} f(x|\theta)}{\displaystyle \sup_{\theta \in \Theta} f(x|\theta)}
+$$
+
+Onde:
+
+O denominador (nosso máximo global) $\sup_{\theta \in \Theta}$ ocorre na estimativa de máxima verossimilhança: $\hat{\theta} = x/10$ (já que nosso $\theta$ tem distribuição uniforma(0,1)).
+
+Já o númerador (o máximo sob $H_0$) $\sup_{\theta \in \Theta_0}$, ocorre no ponto máximo dentro do intervalo [0, 1/2]. 
+
+Então, se $x/10 \le 0.5$ (ou seja, $x \le 5$), o máximo restrito é igual ao global. E por isso, $\lambda(x) = 1$.
+
+Já se $x/10 > 0.5$ (ou seja, $x > 5$), o melhor ponto dentro de $H_0$ é o limite $\theta = 0.5$:
+$$
+V(\theta) = \theta^x(1-\theta)^{10-x}
+$$
+
+Se $x > 5$, dividimos $V(1/2)$ por $V(x/10)$
+
+Calculando isso no r:
+
+```{r rvg, eval=FALSE}
+calc_rvg <- function(x, n) {
+  theta_hat <- x / n
+  theta_0 <- 0.5 
+  
+  # Log-verossimilhança para facilitar
+  log_L <- function(theta) {
+    if(theta == 0 || theta == 1) return(-Inf) 
+    x * log(theta) + (n - x) * log(1 - theta)}
+  
+  # Se a estimativa (x/n) já está em H0 (<= 0.5), lambda = 1
+  if (theta_hat <= theta_0) {
+    return(1.0)
+  } else {
+    # RVG = L(0.5) / L(theta_hat)
+    # Usamos exp(log_L - log_L) para precisão
+    num <- log_L(theta_0)
+    den <- log_L(theta_hat)
+    return(exp(num - den))}}
+```
+
+
+**Calculando o p-valor:**
+
+É a probabilidade de uma Binomial(10, 1/2) gerar um valor maior ou igual ao seu $x$.
+
+$$
+\text{p-valor} = P(X \ge x | \theta = 0.5) = \sum_{k=x}^{n} \binom{n}{k} (0.5)^k (1-0.5)^{n-k} 
+$$
+
+No r:
+
+```{r p_val, eval=FALSE}
+p_val <- pbinom(x - 1, size = n, prob = 0.5, lower.tail = FALSE)
+
+print(p_val)
+```
+
+A função pbinom calcula a cauda esquerda P(X <= k). Para pegar a cauda direita P(X >= x), usamos lower.tail = FALSE. 
+
+Usamos 'x - 1' porque queremos incluir o próprio x na soma.
+
+**Calculando a probabilidade a Posteriori ($P(\theta \in \Theta_0 | x)$)**
+
+Dada uma prior Beta($a, b$), a posteriori é uma distribuição Beta com parâmetros $\alpha' = a + x$ e $\beta' = b + n - x$. 
+
+Queremos a área dessa curva que cai dentro da hipótese nula ($\theta \le 0.5$).
+
+$$ 
+P(\theta \in \Theta_0 | x) = \int_{0}^{0.5} \text{Beta}(\theta | a+x, b+n-x) , d\theta 
+$$
+
+No r:
+
+```{r post, eval=FALSE}
+alpha_post <- a + x
+beta_post  <- b + n - x
+
+prob_post <- pbeta(0.5, shape1 = alpha_post, shape2 = beta_post)
+```
+
+*pbeta* é a função de distribuição acumulada.
+
+
+**Para o e-valor**
+
+$$
+\text{e-valor} = 1 - P(\theta \in T(x) | x) 
+$$
+
+Não sei calcular o e-valor computacionalmente :(
+
+---
+
+Finalmente, a tabela fica:
+
+Não inclui o e-valor, porque não soube calcula-lo
+
+```{r tabela, echo=FALSE}
+# Parametros iniciais
+n <- 10         
+a <- 1; b <- 1  
+x_vals <- 0:10  # vetor de x indo de 0 a 10
+
+# Criar tabela vazia para armazenar os resultados
+tabela <- data.frame(
+  x = x_vals,
+  RVG = numeric(11),
+  p_value = numeric(11),
+  Post_Prob = numeric(11)
+)
+
+for(i in 1:length(x_vals)) {
+  xi <- x_vals[i]
+  
+  # RVG
+  theta_hat <- xi / n
+  
+  if(theta_hat <= 0.5) {
+    tabela$RVG[i] <- 1.0
+  } else {
+    log_L_H0 <- xi * log(0.5) + (n - xi) * log(0.5)
+  
+    if (xi == n) {
+      log_L_Max <- 0 # log(1^n * 0^0) assumindo 0^0=1 -> log(1)=0
+    } else {
+      log_L_Max <- xi * log(theta_hat) + (n - xi) * log(1 - theta_hat)
+    }
+    
+    tabela$RVG[i] <- exp(log_L_H0 - log_L_Max)}
+  
+  # p-valor
+  tabela$p_value[i] <- pbinom(xi - 1, size = n, prob = 0.5, lower.tail = FALSE)
+  
+  # prob posteriori
+  alp <- a + xi
+  bet <- b + n - xi
+  tabela$Post_Prob[i] <- pbeta(0.5, shape1 = alp, shape2 = bet)}
+
+tabela_final <- round(tabela, 4) # arredondar
+
+print(tabela_final)
+```
+
+
