@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Exercício</title>
+<title>Exercicio1</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -57,16 +57,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="exercício_files/libs/clipboard/clipboard.min.js"></script>
-<script src="exercício_files/libs/quarto-html/quarto.js"></script>
-<script src="exercício_files/libs/quarto-html/popper.min.js"></script>
-<script src="exercício_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="exercício_files/libs/quarto-html/anchor.min.js"></script>
-<link href="exercício_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="exercício_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="exercício_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="exercício_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="exercício_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="Exercício1_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Exercício1_files/libs/quarto-html/quarto.js"></script>
+<script src="Exercício1_files/libs/quarto-html/popper.min.js"></script>
+<script src="Exercício1_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Exercício1_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Exercício1_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Exercício1_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Exercício1_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Exercício1_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Exercício1_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -108,7 +108,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Exercício</h1>
+<h1 class="title">Exercicio1</h1>
 </div>
 
 
@@ -130,11 +130,11 @@ window.Quarto = {
 <p>Seja <span class="math inline">\(X_1, \cdots X_n\)</span> v.a. c.i.i.d tais que</p>
 <p><span class="math inline">\(X_i | \theta \sim Ber(\theta) \text{ , } n=10\)</span></p>
 <p><span class="math display">\[
-T(\mathbb{x}) = \sum_{i=1}^{10} X_i | \theta \sim Bin(10, \theta)
+T(\mathbf{x}) = \sum_{i=1}^{10} X_i | \theta \sim Bin(10, \theta)
 \]</span></p>
 <p>Suponha que, a priori, <span class="math inline">\(\theta \sim Beta(a, b)\)</span> (pode fixar <span class="math inline">\((a,b)\)</span>, por exemplo a=b=1, <span class="math inline">\(\theta \sim Unif(0,1))\)</span>, de modo que</p>
 <p><span class="math display">\[
-\theta | \mathbb{X} = \mathbb{x} \sim \sum_{i=1}^{10} X_i = x \sim Beta(a+x, b+n-x)
+\theta | \mathbf{X} = \mathbf{x} \sim \sum_{i=1}^{10} X_i = x \sim Beta(a+x, b+n-x)
 \]</span></p>
 <p>Suponha também que deseja-se testar</p>
 <p><span class="math display">\[
@@ -147,22 +147,22 @@ H_1: \theta &gt; \frac{1}{2}
 \Theta = [0, 1] \\
 \Theta_0 = [0, \frac{1}{2}]
 \]</span></p>
-<p>Vamos estudar o comportamento das estatísticas de teste para cada valor de <span class="math inline">\(x = \sum_{i=1}^n \in \{0, 1, \cdots, 10 \}\)</span> (note que são todos os possíveis valores de <span class="math inline">\(T(\mathbb{X})\)</span>).</p>
+<p>Vamos estudar o comportamento das estatísticas de teste para cada valor de <span class="math inline">\(x = \sum_{i=1}^n \in \{0, 1, \cdots, 10 \}\)</span> (note que são todos os possíveis valores de <span class="math inline">\(T(\mathbf{X})\)</span>).</p>
 <p>Para isso, vamos considerar as estatísticas de teste:</p>
 <p>(<span class="math inline">\(i\)</span>) RVG : <span class="math display">\[
 \lambda (x) = \frac{\displaystyle \sup_{\theta \in \Theta_0} f(x|\theta)}{\displaystyle \sup_{\theta \in \Theta} f(x|\theta)}
 \]</span></p>
 <p>(<span class="math inline">\(ii\)</span>) p-value: <span class="math display">\[
-\sup_{\theta \in \Theta_0} P(X: \lambda(\mathbb{X} \leq \lambda(x)| \theta)
+\sup_{\theta \in \Theta_0} P(X: \lambda(\mathbf{X} \leq \lambda(x)| \theta)
 \]</span></p>
-<p>(<span class="math inline">\(iii\)</span>) <span class="math inline">\(P( \theta \in \Theta_0 | \mathbb{x})\)</span></p>
+<p>(<span class="math inline">\(iii\)</span>) <span class="math inline">\(P( \theta \in \Theta_0 | \mathbf{x})\)</span></p>
 <p>(<span class="math inline">\(iv\)</span>) e-value:</p>
 <p><span class="math display">\[
 Ev(\Theta_0 | x) = 1 - P(\theta \in T_x | x)
 \]</span></p>
 <p>Com</p>
 <p><span class="math display">\[
-T_x = \{ \theta : f(\theta | \mathbb{x} \geq
+T_x = \{ \theta : f(\theta | \mathbf{x} \geq
 \sup_{\theta \in \Theta_0} f(\theta | x) \}
 \]</span></p>
 <hr>
@@ -224,7 +224,7 @@ V(\theta) = \theta^x(1-\theta)^{10-x}
 <p>É a probabilidade de uma Binomial(10, 1/2) gerar um valor maior ou igual ao seu <span class="math inline">\(x\)</span>.</p>
 <p><span class="math display">\[
 \text{p-valor} = P(X \ge x | \theta = 0.5) = \sum_{k=x}^{n} \binom{n}{k} (0.5)^k (1-0.5)^{n-k}
-\]</span></p>
+\]</span> Usamos <span class="math inline">\(\theta = 1/2\)</span> porque é o valor de maximiza <span class="math inline">\(H_0\)</span>.</p>
 <p>No r:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>p_val <span class="ot">&lt;-</span> <span class="fu">pbinom</span>(x <span class="sc">-</span> <span class="dv">1</span>, <span class="at">size =</span> n, <span class="at">prob =</span> <span class="fl">0.5</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span>
@@ -251,24 +251,62 @@ P(\theta \in \Theta_0 | x) = \int_{0}^{0.5} \text{Beta}(\theta | a+x, b+n-x) , d
 <p><span class="math display">\[
 \text{e-valor} = 1 - P(\theta \in T(x) | x)
 \]</span></p>
-<p>Não sei calcular o e-valor computacionalmente :(</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>e_value <span class="ot">&lt;-</span> <span class="cf">function</span>(a, b, <span class="at">theta0 =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">2</span>) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  f <span class="ot">&lt;-</span> <span class="cf">function</span>(theta) <span class="fu">dbeta</span>(theta, a, b)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  f0 <span class="ot">&lt;-</span> <span class="fu">f</span>(theta0) <span class="co"># valor da densidade no ponto da hipótese</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># função g(t) = f(t) - f(theta0)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  g <span class="ot">&lt;-</span> <span class="cf">function</span>(theta) <span class="fu">f</span>(theta) <span class="sc">-</span> f0</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># achar onde a densidade cruza f(theta0)</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  limite_inf <span class="ot">&lt;-</span> (a <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> (a <span class="sc">+</span> b <span class="sc">-</span> <span class="dv">2</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  root <span class="ot">&lt;-</span> <span class="fu">uniroot</span>(g, <span class="at">interval =</span> <span class="fu">c</span>(limite_inf, <span class="dv">1</span>))<span class="sc">$</span>root</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># agora precisamos integrar onde f(t) &gt;= f(theta0)</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  mode <span class="ot">&lt;-</span> (a <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> (a <span class="sc">+</span> b <span class="sc">-</span> <span class="dv">2</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># integral da densidade na região de suporte da hipótese</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  ev <span class="ot">&lt;-</span> <span class="fu">integrate</span>(f, <span class="at">lower =</span> mode, <span class="at">upper =</span> root)<span class="sc">$</span>value</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ev)}</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>e_value <span class="ot">&lt;-</span> <span class="cf">function</span>(a, b, <span class="at">theta0 =</span> <span class="fl">0.5</span>) {</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  f <span class="ot">&lt;-</span> <span class="cf">function</span>(t) <span class="fu">dbeta</span>(t, a, b)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  f0 <span class="ot">&lt;-</span> <span class="fu">f</span>(theta0)  <span class="co"># densidade no ponto da hipótese</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  mode <span class="ot">&lt;-</span> (a <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> (a <span class="sc">+</span> b <span class="sc">-</span> <span class="dv">2</span>) <span class="co"># moda da beta</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (a <span class="sc">&lt;=</span> <span class="dv">1</span> <span class="sc">||</span> b <span class="sc">&lt;=</span> <span class="dv">1</span>) mode <span class="ot">&lt;-</span> theta0  <span class="co"># casos degenerados</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># função g(t) = f(t) - f0</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  g <span class="ot">&lt;-</span> <span class="cf">function</span>(t) <span class="fu">f</span>(t) <span class="sc">-</span> f0</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  <span class="co"># tentar achar raiz à direita do modo</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  root <span class="ot">&lt;-</span> <span class="fu">try</span>(<span class="fu">uniroot</span>(g, <span class="fu">c</span>(theta0, <span class="dv">1</span>), <span class="at">extendInt =</span> <span class="st">"yes"</span>)<span class="sc">$</span>root,</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>              <span class="at">silent =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">inherits</span>(root, <span class="st">"try-error"</span>)) <span class="fu">return</span>(<span class="dv">1</span>)  <span class="co"># se não achar, e-value = 1</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># integrar onde f(t) &gt;= f0</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  ev <span class="ot">&lt;-</span> <span class="fu">integrate</span>(f, <span class="at">lower =</span> mode, <span class="at">upper =</span> root)<span class="sc">$</span>value</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ev)}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <hr>
 <p>Finalmente, a tabela fica:</p>
-<p>Não inclui o e-valor, porque não soube calcula-lo</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>    x    RVG p_value Post_Prob
-1   0 1.0000  1.0000    0.9995
-2   1 1.0000  0.9990    0.9941
-3   2 1.0000  0.9893    0.9673
-4   3 1.0000  0.9453    0.8867
-5   4 1.0000  0.8281    0.7256
-6   5 1.0000  0.6230    0.5000
-7   6 0.8176  0.3770    0.2744
-8   7 0.4392  0.1719    0.1133
-9   8 0.1455  0.0547    0.0327
-10  9 0.0252  0.0107    0.0059
-11 10 0.0010  0.0010    0.0005</code></pre>
+<pre><code>    x    RVG p_value Post_Prob e_value
+1   0 1.0000  1.0000    0.9995  0.0000
+2   1 1.0000  0.9990    0.9941  0.6915
+3   2 1.0000  0.9893    0.9673  0.5847
+4   3 1.0000  0.9453    0.8867  0.4563
+5   4 1.0000  0.8281    0.7256  0.2584
+6   5 1.0000  0.6230    0.5000  0.0000
+7   6 0.8176  0.3770    0.2744 -0.2584
+8   7 0.4392  0.1719    0.1133 -0.4563
+9   8 0.1455  0.0547    0.0327 -0.5847
+10  9 0.0252  0.0107    0.0059 -0.6915
+11 10 0.0010  0.0010    0.0005  0.0000</code></pre>
 </div>
 </div>
 </section>

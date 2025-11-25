@@ -1,5 +1,5 @@
 ---
-title: "Exercício"
+title: "Exercicio1"
 format: html
 ---
 
@@ -10,13 +10,13 @@ Seja $X_1, \cdots X_n$ v.a. c.i.i.d tais que
 $X_i | \theta \sim Ber(\theta) \text{ , } n=10$
 
 $$
-T(\mathbb{x}) = \sum_{i=1}^{10} X_i | \theta \sim Bin(10, \theta)
+T(\mathbf{x}) = \sum_{i=1}^{10} X_i | \theta \sim Bin(10, \theta)
 $$
 
 Suponha que, a priori, $\theta \sim Beta(a, b)$ (pode fixar $(a,b)$, por exemplo a=b=1, $\theta \sim Unif(0,1))$, de modo que
 
 $$
-\theta | \mathbb{X} = \mathbb{x} \sim \sum_{i=1}^{10} X_i = x \sim Beta(a+x, b+n-x)
+\theta | \mathbf{X} = \mathbf{x} \sim \sum_{i=1}^{10} X_i = x \sim Beta(a+x, b+n-x)
 $$
 
 Suponha também que deseja-se testar
@@ -35,7 +35,7 @@ $$
 \Theta_0 = [0, \frac{1}{2}]
 $$
 
-Vamos estudar o comportamento das estatísticas de teste para cada valor de $x = \sum_{i=1}^n \in \{0, 1, \cdots, 10 \}$ (note que são todos os possíveis valores de $T(\mathbb{X})$).
+Vamos estudar o comportamento das estatísticas de teste para cada valor de $x = \sum_{i=1}^n \in \{0, 1, \cdots, 10 \}$ (note que são todos os possíveis valores de $T(\mathbf{X})$).
 
 Para isso, vamos considerar as estatísticas de teste:
 
@@ -46,10 +46,10 @@ $$
 
 ($ii$) p-value: 
 $$
-\sup_{\theta \in \Theta_0} P(X: \lambda(\mathbb{X} \leq \lambda(x)| \theta)
+\sup_{\theta \in \Theta_0} P(X: \lambda(\mathbf{X} \leq \lambda(x)| \theta)
 $$
 
-($iii$) $P( \theta \in \Theta_0 | \mathbb{x})$
+($iii$) $P( \theta \in \Theta_0 | \mathbf{x})$
 
 ($iv$) e-value:
 
@@ -60,7 +60,7 @@ $$
 Com
 
 $$
- T_x = \{ \theta : f(\theta | \mathbb{x} \geq
+ T_x = \{ \theta : f(\theta | \mathbf{x} \geq
 \sup_{\theta \in \Theta_0} f(\theta | x) \}
 $$
 
@@ -147,9 +147,11 @@ calc_rvg <- function(x, n) {
 
 É a probabilidade de uma Binomial(10, 1/2) gerar um valor maior ou igual ao seu $x$.
 
+
 $$
 \text{p-valor} = P(X \ge x | \theta = 0.5) = \sum_{k=x}^{n} \binom{n}{k} (0.5)^k (1-0.5)^{n-k} 
 $$
+Usamos $\theta = 1/2$ porque é o valor de maximiza $H_0$.
 
 No r:
 
@@ -191,13 +193,50 @@ $$
 \text{e-valor} = 1 - P(\theta \in T(x) | x) 
 $$
 
-Não sei calcular o e-valor computacionalmente :(
+```{r e_valor, eval = FALSE}
+e_value <- function(a, b, theta0 = 1/2) {
+  f <- function(theta) dbeta(theta, a, b)
+  f0 <- f(theta0) # valor da densidade no ponto da hipótese
+  
+  # função g(t) = f(t) - f(theta0)
+  g <- function(theta) f(theta) - f0
+  
+  # achar onde a densidade cruza f(theta0)
+  limite_inf <- (a - 1) / (a + b - 2)
+  root <- uniroot(g, interval = c(limite_inf, 1))$root
+  
+  # agora precisamos integrar onde f(t) >= f(theta0)
+  mode <- (a - 1) / (a + b - 2)
+  
+  # integral da densidade na região de suporte da hipótese
+  ev <- integrate(f, lower = mode, upper = root)$value
+  
+  return(ev)}
+
+e_value <- function(a, b, theta0 = 0.5) {
+
+  f <- function(t) dbeta(t, a, b)
+  f0 <- f(theta0)  # densidade no ponto da hipótese
+  
+  mode <- (a - 1) / (a + b - 2) # moda da beta
+  if (a <= 1 || b <= 1) mode <- theta0  # casos degenerados
+  
+  # função g(t) = f(t) - f0
+  g <- function(t) f(t) - f0
+  
+  # tentar achar raiz à direita do modo
+  root <- try(uniroot(g, c(theta0, 1), extendInt = "yes")$root,
+              silent = TRUE)
+  if (inherits(root, "try-error")) return(1)  # se não achar, e-value = 1
+  
+  # integrar onde f(t) >= f0
+  ev <- integrate(f, lower = mode, upper = root)$value
+  return(ev)}
+```
 
 ---
 
 Finalmente, a tabela fica:
-
-Não inclui o e-valor, porque não soube calcula-lo
 
 ```{r tabela, echo=FALSE}
 # Parametros iniciais
@@ -210,39 +249,56 @@ tabela <- data.frame(
   x = x_vals,
   RVG = numeric(11),
   p_value = numeric(11),
-  Post_Prob = numeric(11)
-)
+  Post_Prob = numeric(11),
+  e_value = numeric(11))
 
+# Função para calcular e-value
+e_value_beta <- function(a, b, theta0 = 0.5) {
+  
+  f <- function(t) dbeta(t, a, b)        
+  f0 <- f(theta0)                        
+
+  if (a > 1 && b > 1) {
+    mode <- (a - 1) / (a + b - 2)} 
+  else {
+    mode <- theta0}
+
+  g <- function(t) f(t) - f0
+  root <- try(uniroot(g, c(theta0, 1), extendInt = "yes")$root,
+              silent = TRUE)
+  if (inherits(root, "try-error")) return(1)
+  ev <- integrate(f, lower = mode, upper = root)$value
+  return(ev)}
+
+# Loop principal
 for(i in 1:length(x_vals)) {
   xi <- x_vals[i]
   
-  # RVG
+  # RVG 
   theta_hat <- xi / n
   
   if(theta_hat <= 0.5) {
-    tabela$RVG[i] <- 1.0
-  } else {
+    tabela$RVG[i] <- 1.0} 
+  else {
     log_L_H0 <- xi * log(0.5) + (n - xi) * log(0.5)
-  
     if (xi == n) {
-      log_L_Max <- 0 # log(1^n * 0^0) assumindo 0^0=1 -> log(1)=0
-    } else {
-      log_L_Max <- xi * log(theta_hat) + (n - xi) * log(1 - theta_hat)
-    }
+      log_L_Max <- 0}
+    else {
+      log_L_Max <- xi * log(theta_hat) + (n - xi) * log(1 - theta_hat)}
     
     tabela$RVG[i] <- exp(log_L_H0 - log_L_Max)}
   
-  # p-valor
+  # p-valor 
   tabela$p_value[i] <- pbinom(xi - 1, size = n, prob = 0.5, lower.tail = FALSE)
   
-  # prob posteriori
+  # posteriori 
   alp <- a + xi
   bet <- b + n - xi
-  tabela$Post_Prob[i] <- pbeta(0.5, shape1 = alp, shape2 = bet)}
+  tabela$Post_Prob[i] <- pbeta(0.5, shape1 = alp, shape2 = bet)
+  
+  # e-value
+  tabela$e_value[i] <- e_value_beta(alp, bet, theta0 = 0.5)}
 
-tabela_final <- round(tabela, 4) # arredondar
-
+tabela_final <- round(tabela, 4)
 print(tabela_final)
 ```
-
-
