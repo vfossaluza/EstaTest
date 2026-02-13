@@ -1,0 +1,36 @@
+---
+title: "Novo exemplo"
+format: html
+---
+
+RASCUNHOOO!!! NÃO ESTÁ PRONTOOOO!!
+
+---
+
+Costumamos calcular o e-value usando uma região $T_x$, essa região é definida por 
+
+$$
+ T_x = \{ \theta \in \Theta_0  : f(\theta | \mathbf{x}) \geq
+\sup_{\theta \in \Theta_0} f(\theta | x) \}
+$$
+Com isso, calculamos o e-value
+
+$$
+Ev(\Theta_0 | x) = 1 - P(\theta \in T_x | x)
+$$
+
+Porém, podemos calcular o e-value usando uma outra região, que chamaremos de $T^*$ e definiremos como:
+
+$$
+T^* = \left \{ \theta \in \Theta_0 : \frac{f(\theta | x)}{f_0(\theta)} \geq \sup_{\theta \in \Theta_0} \frac{f(\theta | x)}{f_0 (\theta)} \right \}
+$$
+
+Chamamos de 
+
+- $s(\theta) = \frac{f(\theta | x)}{f_0(\theta)}$ : nossa surpresa relativa.
+
+- $f_0$ : priori quando não temos nenhuma informação.
+
+
+
+

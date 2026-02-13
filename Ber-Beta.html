@@ -57,16 +57,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="Exercício1_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Exercício1_files/libs/quarto-html/quarto.js"></script>
-<script src="Exercício1_files/libs/quarto-html/popper.min.js"></script>
-<script src="Exercício1_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="Exercício1_files/libs/quarto-html/anchor.min.js"></script>
-<link href="Exercício1_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Exercício1_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="Exercício1_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="Exercício1_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Exercício1_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="Ber-Beta_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Ber-Beta_files/libs/quarto-html/quarto.js"></script>
+<script src="Ber-Beta_files/libs/quarto-html/popper.min.js"></script>
+<script src="Ber-Beta_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Ber-Beta_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Ber-Beta_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Ber-Beta_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Ber-Beta_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Ber-Beta_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Ber-Beta_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -168,7 +168,7 @@ x \in \{0, 1, 2, \dots, 10\}
 <p><span class="math display">\[
 \sup_{\theta \in \Theta_0} P(X: \lambda(\mathbf{X} \leq \lambda(x)| \theta)
 \]</span></p>
-<p>**3. Probabilidade a Posteriori (<span class="math inline">\(P(\theta \in \Theta_0|\mathbf{x})\)</span>): A probabilidade direta da hipótese nula ser verdadeira dado os dados.</p>
+<p><strong>3. Probabilidade a Posteriori (<span class="math inline">\(P(\theta \in \Theta_0|\mathbf{x})\)</span>):</strong> A probabilidade direta da hipótese nula ser verdadeira dado os dados.</p>
 <p><strong>4. e-value:</strong></p>
 <p><span class="math display">\[
 Ev(\Theta_0 | x) = 1 - P(\theta \in T_x | x)
@@ -178,7 +178,7 @@ Ev(\Theta_0 | x) = 1 - P(\theta \in T_x | x)
 T_x = \{ \theta : f(\theta | \mathbf{x} \geq
 \sup_{\theta \in \Theta_0} f(\theta | x) \}
 \]</span></p>
-<p>Ao final, depois de mostrar a parte computacional (como calcular cada valor no R), mostraremos a evolução dessas medidas graficamente, ou seja, como cada abordagem reage a variação da nossa estatística suficiente,</p>
+<p>Ao final, depois de mostrar a parte computacional (como calcular cada valor no R), mostraremos a evolução dessas medidas graficamente, ou seja, como cada abordagem reage a variação da nossa estatística suficiente.</p>
 <hr>
 <p>Definindo nossos parâmetros iniciais:</p>
 <div class="cell">
@@ -188,8 +188,8 @@ T_x = \{ \theta : f(\theta | \mathbf{x} \geq
 </div>
 <hr>
 </section>
-<section id="rgv" class="level2">
-<h2 class="anchored" data-anchor-id="rgv">RGV</h2>
+<section id="rvg" class="level2">
+<h2 class="anchored" data-anchor-id="rvg">RVG</h2>
 <p>A razão de verossimilhança é calculada por:</p>
 <p><span class="math display">\[
 \lambda (x) = \frac{\displaystyle \sup_{\theta \in \Theta_0} f(x|\theta)}{\displaystyle \sup_{\theta \in \Theta} f(x|\theta)}
@@ -207,7 +207,7 @@ T_x = \{ \theta : f(\theta | \mathbf{x} \geq
 </section>
 <section id="p-valor" class="level2">
 <h2 class="anchored" data-anchor-id="p-valor">p-valor</h2>
-<p>Como nosso teste é unilateral à direita (<span class="math inline">\(H_1: \theta &gt; 0.5\)</span>), valores altos de <span class="math inline">\(x\)</span> fornecem evidência contra a hipótese nula. Para o p-valor buscamos o supremo da probabilidade na região de rejeição sob o espaço da hipótese nula <span class="math inline">\(\Theta_0 = [0, 0.5]\)</span>.</p>
+<p>Como nosso teste é unicaudal à direita (<span class="math inline">\(H_1: \theta &gt; 0.5\)</span>), valores altos de <span class="math inline">\(x\)</span> fornecem evidência contra a hipótese nula. Para o p-valor buscamos o supremo da probabilidade na região de rejeição sob o espaço da hipótese nula <span class="math inline">\(\Theta_0 = [0, 0.5]\)</span>.</p>
 <p>Como a probabilidade de obter sucessos aumenta com <span class="math inline">\(\theta\)</span>, o valor máximo (o “pior caso” para <span class="math inline">\(H_0\)</span>) ocorre em <span class="math inline">\(\theta = 0.5\)</span>. Ou seja, calculamos a probabilidade de uma variável <span class="math inline">\(X \sim \text{Binomial}(10, 1/2)\)</span> ser maior ou igual ao valor observado <span class="math inline">\(x\)</span>.</p>
 <p><span class="math display">\[
 \text{p-valor} = P(X \ge x | \theta = 0.5) = \sum_{k=x}^{10} \binom{10}{x} (1/2)^x (1-1/2)^{10-x}
@@ -279,18 +279,22 @@ P(\theta \in \Theta_0 | x) = \int_{0}^{1/2} f(\theta | 1+x, 1+10-x)  d\theta
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Exercício1_files/figure-html/graf-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Ber-Beta_files/figure-html/graf-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
+</div>
+<p>Esses quatro gráficos mostram como a evidência a favor da hipótese nula (<span class="math inline">\(H_0: \theta \le 0.5\)</span>) desaparece à medida que o número de sucessos (<span class="math inline">\(x\)</span>) aumenta.</p>
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Exercício1_files/figure-html/graf-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Ber-Beta_files/figure-html/graf_5-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+<p>Pelo gráfico de dispersão, podemos ver que para o modelo Bernoulli-Beta, com o teste sendo unicaudal e fixado <span class="math inline">\(n=10\)</span>, não parece ter muitas diferenças entre as duas abordagens. Ambos concordam a favor ou contra a hipótese nula, ou seja, quando o p-valor é pequeno (indicando rejeição estatística), o e-valor também é pequeno, e quando o p-valor é alto, o e-valor também é.</p>
 </section>
 
 </main>

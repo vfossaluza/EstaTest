@@ -1,0 +1,302 @@
+---
+title: "Modelo Exponencial-Gama"
+format: html
+---
+
+## Introdução
+
+Queremos analisar o comportamento de diferentes estatísticas de teste sobre o tempo de vida de um componente. Para isso, usaremos uma distribuição Exponencial, com parâmetro $\lambda$, onde buscaremos testar hipóteses sobre esse parâmetro.
+
+---
+
+## Definindo o modelo
+
+Seja $X_1, \dots, X_n$ v.a.c.i.i.d. tal que $X_i|\lambda \sim \text{Exp}(\lambda)$. A função densidade é dada por $f(x) = \lambda e^{-\lambda x}$. Vamos fixar o tamanho da amostra em $n=10$.
+
+Nesse caso, a estatística suficiente é a soma dos tempos observados: $T(\mathbf{x}) = \sum_{i=1}^{10} x_i$. Temos que soma de $n$ Exponenciais($\lambda$) segue uma distribuição Gama:
+
+$$
+T(\mathbf{x}) \sim (n, \lambda)
+$$
+
+Suponha que, a priori para o $\lambda$ será Gama, também fixaremos os parâmetros em $alpha=2$ e $\beta =1$.
+
+Consequentemente, a distribuição a posteriori para um dado $x$ será:
+
+$$
+\lambda | \mathbf{x} \sim \text{Gama}(\alpha_{post} = 2 + n, \, \beta_{post} = 1 + x)
+$$
+---
+
+## Teste de Hipótese
+
+Deseja-se testar
+
+$$
+H_0: \lambda = 1.5 \quad \text{vs} \quad H_1: \lambda \neq 1.5
+$$
+
+Como $H_0$ diz que $\lambda=1.5$, o valor esperado da nossa estatística suficiente é $E[T] = n / \lambda = 10 / 1.5 \approx 6.67$.
+
+Vamos estudar o comportamento das estatísticas de tese para uma sequência de valores $x$ (soma), em torno dessa média esperada (variando de 2 a 18), $x = \sum_{i=1}^{10} \in \{2, \cdots, 18 \}$.
+
+De maneira computacional:
+
+```{r seq}
+x_seq <- seq(from = 2, to = 18, by = 0.5)
+```
+
+Para cada um desses valores possíveis de $x$, vamos calcular (e depois comparar) quatro medidas de estatística de teste:
+
+**1. RVG (Razão de Verossimilhança Generalizada) - $\lambda(x)$:** que é baseada na razão entre o supremo da verossimilhança sob $H_0$ e sob todo o espaço paramétrico.
+
+$$
+\lambda (x) = \frac{\displaystyle \sup_{\theta \in \Theta_0} f(x|\theta)}{\displaystyle \sup_{\theta \in \Theta} f(x|\theta)}
+$$
+
+**2. p-value:** é a probabilidade, sob $H_0$, de obter uma estatística de teste tão ou mais extrema que a observada.
+
+$$
+\sup_{\theta \in \Theta_0} P(X: \lambda(\mathbf{X} \leq \lambda(x)| \theta)
+$$
+
+**3. Probabilidade a Posteriori ($P(\theta \in \Theta_0|\mathbf{x})$):** A probabilidade direta da hipótese nula ser verdadeira dado os dados. 
+
+**4. e-value:**
+
+$$
+Ev(\Theta_0 | x) = 1 - P(\theta \in T_x | x)
+$$
+
+Com
+
+$$
+ T_x = \{ \theta : f(\theta | \mathbf{x} \geq
+\sup_{\theta \in \Theta_0} f(\theta | x) \}
+$$
+
+Ao final, depois de mostrar a parte computacional (como calcular cada valor no R), mostraremos a evolução dessas medidas graficamente, ou seja, como cada abordagem reage a variação da nossa estatística suficiente,
+
+---
+
+Definindo parâmetros
+
+```{r parâmetros}
+n <- 10
+lambda_0 <- 1.5          
+val_esperado <- n / lambda_0 
+x_seq <- seq(from = 2, to = 18, by = 0.5)
+
+# Priori Gama(2, 1)
+alpha_prior <- 2
+beta_prior <- 1
+```
+
+---
+
+## RVG
+
+Para calcular a RVG usamos a Estimativa de Máxima Verossimilhança (EMV), que é dada por $\hat{\lambda} = x/n$. 
+
+A razão de verossimilhança é calculada por:
+
+$$
+\lambda (x) = \frac{\displaystyle \sup_{\theta \in \Theta_0} f(x|\theta)}{\displaystyle \sup_{\theta \in \Theta} f(x|\theta)}
+$$
+
+Calculando:
+
+$$
+\lambda(x) = \frac{V(\lambda_0)}{V(\hat{\lambda})} = \frac{\lambda_0^n e^{-\lambda_0 T}}{(\frac{n}{T})^n e^{-\frac{n}{T} T}} = \frac{\lambda_0^n e^{-\lambda_0 T}}{(\frac{n}{T})^n e^{-n}}
+$$
+
+Computacionalmente:
+
+```{r}
+calc_RVG_exp <- function(t, n, lambda0) {
+  # EMV sob H1
+  lambda_hat <- n / t
+  
+  # log-V H0
+  ll_H0 <- n * log(lambda0) - lambda0 * t
+  
+  # log-V H1 (Máxima)
+  ll_H1 <- n * log(lambda_hat) - lambda_hat * t 
+  
+  return(exp(ll_H0 - ll_H1))}
+```
+
+---
+
+## p-valor
+
+Se nossa estatística suficiente estiver próxima de 6,67 o p-valor será muito alto, já que a soma observada é a mesma da hipótese nula. Já para valores baixos ou altos o p-valor cairá.
+
+Computacionalmente
+
+```{r p_val, eval = FALSE}
+calcular_pvalor <- function(t_obs, n, lambda_0) {
+  p_inf <- pgamma(t_obs, shape = n, rate = lambda_0)
+  p_sup <- 1 - pgamma(t_obs, shape = n, rate = lambda_0)
+  p_val <- 2 * min(p_inf, p_sup)
+
+  return(min(p_val, 1.0))}
+```
+
+---
+
+## Probabilidade a posteriori
+
+Como nosso $H_0$ é exatamente igual a 15, a probabilidade de uma Pareto ser exatamente 15 é 0 (porque temos uma v.a contínua).
+
+```{r post, eval = FALSE}
+post_pontual <- function() {
+  return(0)}
+```
+
+---
+
+## e-valor
+
+Queremos calcular:
+
+$$
+\text{e-valor} = 1 - P(\theta \in T(x) | x) 
+$$
+
+```{r}
+calcular_evalor <- function(x_obs, n, lambda_0, alpha_pri, beta_pri) {
+  dens_h0 <- dgamma(lambda_0, shape = alpha_post, rate = beta_post)
+
+  moda <- (alpha_post - 1) / beta_post
+
+  if (abs(lambda_0 - moda) < 1e-6) {
+    return(1.0)}
+  f_dif <- function(lambda) {
+    dgamma(lambda, shape = alpha_post, rate = beta_post) - dens_h0}
+  
+  prob_conjunto_tangente <- 0
+  
+  if (lambda_0 < moda) {
+    limite_sup <- try(uniroot(f_dif, interval = c(moda, moda + 20))$root, silent = TRUE)
+    if(!is.numeric(limite_sup)) limite_sup <- Inf
+    prob_conjunto_tangente <- pgamma(limite_sup, alpha_post, beta_post) - 
+                              pgamma(lambda_0, alpha_post, beta_post)}
+  else {
+    limite_inf <- try(uniroot(f_dif, interval = c(1e-10, moda))$root, silent = TRUE)
+    if(!is.numeric(limite_inf)) limite_inf <- 0 
+    prob_conjunto_tangente <- pgamma(lambda_0, alpha_post, beta_post) - 
+                              pgamma(limite_inf, alpha_post, beta_post)}
+  
+  e_valor <- 1 - prob_conjunto_tangente
+  return(e_valor)}
+```
+
+
+---
+
+## Gráficos
+
+```{r dados, echo=FALSE, warning=FALSE}
+library(ggplot2)
+library(patchwork)
+
+n <- 10
+lambda_0 <- 1.5          
+val_esperado <- n / lambda_0 
+x_seq <- seq(from = 2, to = 18, by = 0.5)
+alpha_prior <- 2
+beta_prior <- 1
+
+resultados <- data.frame(
+  x = x_seq,
+  RVG = NA,
+  p_valor = NA,
+  Posteriori = NA,
+  e_valor = NA)
+
+for (i in 1:length(x_seq)) {
+  x_loop <- x_seq[i] 
+  
+  # RVG 
+  theta_hat <- n / x_loop 
+  log_L <- function(lam, sum_x, n) {
+    n * log(lam) - lam * sum_x}
+  
+  log_L_H0 <- log_L(lambda_0, x_loop, n)
+  log_L_Global <- log_L(theta_hat, x_loop, n)
+  
+  resultados$RVG[i] <- exp(log_L_H0 - log_L_Global)
+  
+  # p-valor 
+  prob_acumulada <- pgamma(x_loop, shape = n, rate = lambda_0)
+  resultados$p_valor[i] <- 2 * min(prob_acumulada, 1 - prob_acumulada)
+  
+  # Posteriori
+  resultados$Posteriori[i] <- 0
+  
+  # e-valor 
+  alpha_post <- alpha_prior + n
+  beta_post <- beta_prior + x_loop
+  densidade_corte <- dgamma(lambda_0, shape = alpha_post, rate = beta_post)
+  moda_post <- (alpha_post - 1) / beta_post
+  
+  f_busca <- function(t) dgamma(t, alpha_post, rate = beta_post) - densidade_corte
+
+  if (abs(moda_post - lambda_0) < 0.01) {
+    resultados$e_valor[i] <- 1} 
+  else {
+    raiz_esq <- try(uniroot(f_busca, interval = c(0.0001, moda_post))$root, silent=TRUE)
+    raiz_dir <- try(uniroot(f_busca, interval = c(moda_post, moda_post + 20))$root, silent=TRUE)
+    
+    if(!inherits(raiz_esq, "try-error") & !inherits(raiz_dir, "try-error")) {
+      prob_tangente <- pgamma(raiz_dir, shape=alpha_post, rate=beta_post) - 
+                       pgamma(raiz_esq, shape=alpha_post, rate=beta_post)
+      resultados$e_valor[i] <- 1 - prob_tangente} 
+    else {
+      resultados$e_valor[i] <- 0}}}
+```
+
+
+```{r graf, echo=FALSE, warning=FALSE}
+tema <- theme_bw() + theme(panel.grid.minor = element_blank())
+
+# Gráfico 1: RVG
+g1 <- ggplot(resultados, aes(x=x, y=RVG)) + 
+  geom_line(color="blue", size=1) + geom_point(size=1) +
+  labs(title="RVG", subtitle="Pico esperado em x ~ 6.67", y=expression(lambda(x))) + tema
+
+# Gráfico 2: p-valor
+g2 <- ggplot(resultados, aes(x=x, y=p_valor)) + 
+  geom_line(color="deeppink", size=1) + geom_point(size=1) +
+  geom_hline(yintercept=0.05, linetype="dashed", color="gray") +
+  labs(title="p-valor (Bilateral)", y="p-valor") + tema
+
+# Gráfico 3: Posteriori
+g3 <- ggplot(resultados, aes(x=x, y=Posteriori)) + 
+  geom_line(color="green4", size=1) + geom_point(size=1) +
+  labs(title="Posteriori (H0 Pontual)", y="P(H0|x)") + tema
+
+# Gráfico 4: e-valor
+g4 <- ggplot(resultados, aes(x=x, y=e_valor)) + 
+  geom_line(color="purple", size=1) + geom_point(size=1) +
+  labs(title="e-valor (FBST)", y="ev(H0|x)") + tema
+
+(g1 + g2) / (g3 + g4)
+```
+
+Conseguimos ver que o RVG, o p-valor e o e-valor são parecidos, neles o pico ocorre exatamente em $x \approx 6.67$, onde os dados são mais compatíveis com a hipótese nula.
+
+
+```{r graf_5, echo=FALSE, warning=FALSE}
+# Gráfico 5: Dispersão p-valor vs e-valor 
+g5 <- ggplot(resultados, aes(x=p_valor, y=e_valor)) +
+  geom_point(size=3, color = "black") + 
+  geom_abline(slope=1, intercept=0, linetype="dashed", color = "gray", size=1) + 
+  labs(title="p-valor vs e-valor", subtitle="Modelo Exponencial-Gama") + tema
+
+print(g5)
+```
+
+Os pontos seguem a linha $x=y$, ou seja, nesse caso, as duas métricas dão resultados muito próximos.
+

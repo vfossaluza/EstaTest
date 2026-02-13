@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Modelo Bernoulli-Beta</title>
+<title>Modelo Exponencial-Gama</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -57,16 +57,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="Exercício1_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Exercício1_files/libs/quarto-html/quarto.js"></script>
-<script src="Exercício1_files/libs/quarto-html/popper.min.js"></script>
-<script src="Exercício1_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="Exercício1_files/libs/quarto-html/anchor.min.js"></script>
-<link href="Exercício1_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Exercício1_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="Exercício1_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="Exercício1_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Exercício1_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="Exp-Gama_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Exp-Gama_files/libs/quarto-html/quarto.js"></script>
+<script src="Exp-Gama_files/libs/quarto-html/popper.min.js"></script>
+<script src="Exp-Gama_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Exp-Gama_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Exp-Gama_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Exp-Gama_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Exp-Gama_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Exp-Gama_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Exp-Gama_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -108,7 +108,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Modelo Bernoulli-Beta</h1>
+<h1 class="title">Modelo Exponencial-Gama</h1>
 </div>
 
 
@@ -127,20 +127,20 @@ window.Quarto = {
 
 <section id="introdução" class="level2">
 <h2 class="anchored" data-anchor-id="introdução">Introdução</h2>
-<p>Queremos analisar o comportamento de diferentes estatísticas de teste sobre uma proporção populacional <span class="math inline">\(\theta\)</span>. Vamos pensar em dados binários, ou seja, usaremos uma distribuição Bernoulli, onde buscaremos testar hipóteses sobre o parâmetro de sucesso <span class="math inline">\(\theta\)</span>.</p>
+<p>Queremos analisar o comportamento de diferentes estatísticas de teste sobre o tempo de vida de um componente. Para isso, usaremos uma distribuição Exponencial, com parâmetro <span class="math inline">\(\lambda\)</span>, onde buscaremos testar hipóteses sobre esse parâmetro.</p>
 <hr>
 </section>
 <section id="definindo-o-modelo" class="level2">
 <h2 class="anchored" data-anchor-id="definindo-o-modelo">Definindo o modelo</h2>
-<p>Seja <span class="math inline">\(X_1, \cdots X_n\)</span> v.a. c.i.i.d tais que <span class="math inline">\(X_i | \theta \sim Bernoulli(\theta)\)</span>. Para esse exercício fixaremos <span class="math inline">\(n=10\)</span>.</p>
-<p>Para esse caso, a estatística suficiente para <span class="math inline">\(\theta\)</span> é a soma dos sucessos, denotada por <span class="math inline">\(T(\mathbf{x}) = \sum_{i=1}^{10} X_i\)</span>, que segue uma distribuição Binomial, ou seja:</p>
+<p>Seja <span class="math inline">\(X_1, \dots, X_n\)</span> v.a.c.i.i.d. tal que <span class="math inline">\(X_i|\lambda \sim \text{Exp}(\lambda)\)</span>. A função densidade é dada por <span class="math inline">\(f(x) = \lambda e^{-\lambda x}\)</span>. Vamos fixar o tamanho da amostra em <span class="math inline">\(n=10\)</span>.</p>
+<p>Nesse caso, a estatística suficiente é a soma dos tempos observados: <span class="math inline">\(T(\mathbf{x}) = \sum_{i=1}^{10} x_i\)</span>. Temos que soma de <span class="math inline">\(n\)</span> Exponenciais(<span class="math inline">\(\lambda\)</span>) segue uma distribuição Gama:</p>
 <p><span class="math display">\[
-T(\mathbf{x}) = \sum_{i=1}^{10} X_i | \theta \sim Bin(10, \theta)
+T(\mathbf{x}) \sim (n, \lambda)
 \]</span></p>
-<p>Suponha que, a priori desse modelo seja uma priori conjugada <span class="math inline">\(\theta \sim \text{Beta}(a, b)\)</span>. Para facilitar e não termos preferência para nenhum valor, fixaremos os parâmetros como <span class="math inline">\(a=1\)</span> e <span class="math inline">\(b=1\)</span>, ou seja, uma distribuição Uniforme no intervalo <span class="math inline">\((0, 1)\)</span>.</p>
+<p>Suponha que, a priori para o <span class="math inline">\(\lambda\)</span> será Gama, também fixaremos os parâmetros em <span class="math inline">\(alpha=2\)</span> e <span class="math inline">\(\beta =1\)</span>.</p>
 <p>Consequentemente, a distribuição a posteriori para um dado <span class="math inline">\(x\)</span> será:</p>
 <p><span class="math display">\[
-\theta | \mathbf{x} = \mathbf{x} \sim \text{Beta}(1+x, 1+n-x)
+\lambda | \mathbf{x} \sim \text{Gama}(\alpha_{post} = 2 + n, \, \beta_{post} = 1 + x)
 \]</span></p>
 <hr>
 </section>
@@ -148,16 +148,13 @@ T(\mathbf{x}) = \sum_{i=1}^{10} X_i | \theta \sim Bin(10, \theta)
 <h2 class="anchored" data-anchor-id="teste-de-hipótese">Teste de Hipótese</h2>
 <p>Deseja-se testar</p>
 <p><span class="math display">\[
-H_0: \theta \leq \frac{1}{2} \, \text{ contra } \,  H_1: \theta &gt; \frac{1}{2}
+H_0: \lambda = 1.5 \quad \text{vs} \quad H_1: \lambda \neq 1.5
 \]</span></p>
-<p>Desse modo, nosso espaço paramétrico é <span class="math inline">\(\Theta = [0, 1]\)</span> e o subespaço de <span class="math inline">\(H_0\)</span> é <span class="math inline">\(\Theta_0 = [0, 0.5]\)</span>.</p>
-<p>Vamos estudar o comportamento das estatísticas de teste para cada valor de <span class="math inline">\(x = \sum_{i=1}^n \in \{0, 1, \cdots, 10 \}\)</span> (note que são todos os possíveis valores de <span class="math inline">\(T(\mathbf{X})\)</span>).</p>
-<p>Como fixamos o tamanho da amostra em <span class="math inline">\(n=10\)</span>, a estatística suficiente <span class="math inline">\(x\)</span> vai variar em um intervalo discreto e finito:</p>
-<p><span class="math display">\[
-x \in \{0, 1, 2, \dots, 10\}
-\]</span> De maneira computacional</p>
+<p>Como <span class="math inline">\(H_0\)</span> diz que <span class="math inline">\(\lambda=1.5\)</span>, o valor esperado da nossa estatística suficiente é <span class="math inline">\(E[T] = n / \lambda = 10 / 1.5 \approx 6.67\)</span>.</p>
+<p>Vamos estudar o comportamento das estatísticas de tese para uma sequência de valores <span class="math inline">\(x\)</span> (soma), em torno dessa média esperada (variando de 2 a 18), <span class="math inline">\(x = \sum_{i=1}^{10} \in \{2, \cdots, 18 \}\)</span>.</p>
+<p>De maneira computacional:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">10</span>, <span class="at">by =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>x_seq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">2</span>, <span class="at">to =</span> <span class="dv">18</span>, <span class="at">by =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Para cada um desses valores possíveis de <span class="math inline">\(x\)</span>, vamos calcular (e depois comparar) quatro medidas de estatística de teste:</p>
 <p><strong>1. RVG (Razão de Verossimilhança Generalizada) - <span class="math inline">\(\lambda(x)\)</span>:</strong> que é baseada na razão entre o supremo da verossimilhança sob <span class="math inline">\(H_0\)</span> e sob todo o espaço paramétrico.</p>
@@ -168,7 +165,7 @@ x \in \{0, 1, 2, \dots, 10\}
 <p><span class="math display">\[
 \sup_{\theta \in \Theta_0} P(X: \lambda(\mathbf{X} \leq \lambda(x)| \theta)
 \]</span></p>
-<p>**3. Probabilidade a Posteriori (<span class="math inline">\(P(\theta \in \Theta_0|\mathbf{x})\)</span>): A probabilidade direta da hipótese nula ser verdadeira dado os dados.</p>
+<p><strong>3. Probabilidade a Posteriori (<span class="math inline">\(P(\theta \in \Theta_0|\mathbf{x})\)</span>):</strong> A probabilidade direta da hipótese nula ser verdadeira dado os dados.</p>
 <p><strong>4. e-value:</strong></p>
 <p><span class="math display">\[
 Ev(\Theta_0 | x) = 1 - P(\theta \in T_x | x)
@@ -180,96 +177,101 @@ T_x = \{ \theta : f(\theta | \mathbf{x} \geq
 \]</span></p>
 <p>Ao final, depois de mostrar a parte computacional (como calcular cada valor no R), mostraremos a evolução dessas medidas graficamente, ou seja, como cada abordagem reage a variação da nossa estatística suficiente,</p>
 <hr>
-<p>Definindo nossos parâmetros iniciais:</p>
+<p>Definindo parâmetros</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>lambda_0 <span class="ot">&lt;-</span> <span class="fl">1.5</span>          </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>val_esperado <span class="ot">&lt;-</span> n <span class="sc">/</span> lambda_0 </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>x_seq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">2</span>, <span class="at">to =</span> <span class="dv">18</span>, <span class="at">by =</span> <span class="fl">0.5</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Priori Gama(2, 1)</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>alpha_prior <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>beta_prior <span class="ot">&lt;-</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 </section>
-<section id="rgv" class="level2">
-<h2 class="anchored" data-anchor-id="rgv">RGV</h2>
+<section id="rvg" class="level2">
+<h2 class="anchored" data-anchor-id="rvg">RVG</h2>
+<p>Para calcular a RVG usamos a Estimativa de Máxima Verossimilhança (EMV), que é dada por <span class="math inline">\(\hat{\lambda} = x/n\)</span>.</p>
 <p>A razão de verossimilhança é calculada por:</p>
 <p><span class="math display">\[
 \lambda (x) = \frac{\displaystyle \sup_{\theta \in \Theta_0} f(x|\theta)}{\displaystyle \sup_{\theta \in \Theta} f(x|\theta)}
 \]</span></p>
-<p>Onde:</p>
-<ul>
-<li><p>Denominador: Ocorre na Estimativa de Máxima Verossimilhança (EMV), que é dada por <span class="math inline">\(\hat{\theta} = x/n\)</span>. Como <span class="math inline">\(n=10 \Rightarrow \hat{\theta} = x/10\)</span>.</p></li>
-<li><p>Numerador: Ocorre no ponto máximo dentro do intervalo [0, 1/2].</p></li>
-</ul>
-<p>Se a estimativa cair dentro de <span class="math inline">\(H_0\)</span>, ou seja, se <span class="math inline">\(\hat{\theta} \le 1/2\)</span> (que acontece em <span class="math inline">\(x \in \{0, \dots, 5\}\)</span>), o numerador e o denominador são igual, logo <span class="math inline">\(\lambda(x) = 1\)</span>. Já para <span class="math inline">\(x &gt; 5\)</span>:</p>
+<p>Calculando:</p>
 <p><span class="math display">\[
-\lambda(x) = \frac{V(1/2 | x)}{V(x/10 | x)} = \frac{0.5^x (1-0.5)^{10-x}}{(x/10)^x (1 - x/10)^{10-x}}
+\lambda(x) = \frac{V(\lambda_0)}{V(\hat{\lambda})} = \frac{\lambda_0^n e^{-\lambda_0 T}}{(\frac{n}{T})^n e^{-\frac{n}{T} T}} = \frac{\lambda_0^n e^{-\lambda_0 T}}{(\frac{n}{T})^n e^{-n}}
 \]</span></p>
+<p>Computacionalmente:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>calc_RVG_exp <span class="ot">&lt;-</span> <span class="cf">function</span>(t, n, lambda0) {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># EMV sob H1</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  lambda_hat <span class="ot">&lt;-</span> n <span class="sc">/</span> t</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># log-V H0</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  ll_H0 <span class="ot">&lt;-</span> n <span class="sc">*</span> <span class="fu">log</span>(lambda0) <span class="sc">-</span> lambda0 <span class="sc">*</span> t</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># log-V H1 (Máxima)</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  ll_H1 <span class="ot">&lt;-</span> n <span class="sc">*</span> <span class="fu">log</span>(lambda_hat) <span class="sc">-</span> lambda_hat <span class="sc">*</span> t </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">exp</span>(ll_H0 <span class="sc">-</span> ll_H1))}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <hr>
 </section>
 <section id="p-valor" class="level2">
 <h2 class="anchored" data-anchor-id="p-valor">p-valor</h2>
-<p>Como nosso teste é unilateral à direita (<span class="math inline">\(H_1: \theta &gt; 0.5\)</span>), valores altos de <span class="math inline">\(x\)</span> fornecem evidência contra a hipótese nula. Para o p-valor buscamos o supremo da probabilidade na região de rejeição sob o espaço da hipótese nula <span class="math inline">\(\Theta_0 = [0, 0.5]\)</span>.</p>
-<p>Como a probabilidade de obter sucessos aumenta com <span class="math inline">\(\theta\)</span>, o valor máximo (o “pior caso” para <span class="math inline">\(H_0\)</span>) ocorre em <span class="math inline">\(\theta = 0.5\)</span>. Ou seja, calculamos a probabilidade de uma variável <span class="math inline">\(X \sim \text{Binomial}(10, 1/2)\)</span> ser maior ou igual ao valor observado <span class="math inline">\(x\)</span>.</p>
-<p><span class="math display">\[
-\text{p-valor} = P(X \ge x | \theta = 0.5) = \sum_{k=x}^{10} \binom{10}{x} (1/2)^x (1-1/2)^{10-x}
-\]</span> Para calcular isso no R:</p>
-<p>Para calcular P(X &gt;= x), usamos a função de distribuição acumulada pbinom.</p>
+<p>Se nossa estatística suficiente estiver próxima de 6,67 o p-valor será muito alto, já que a soma observada é a mesma da hipótese nula. Já para valores baixos ou altos o p-valor cairá.</p>
+<p>Computacionalmente</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>p_val <span class="ot">&lt;-</span> <span class="fu">pbinom</span>(<span class="at">q =</span> x <span class="sc">-</span> <span class="dv">1</span>, <span class="at">size =</span> n, <span class="at">prob =</span> <span class="fl">0.5</span>, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>calcular_pvalor <span class="ot">&lt;-</span> <span class="cf">function</span>(t_obs, n, lambda_0) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  p_inf <span class="ot">&lt;-</span> <span class="fu">pgamma</span>(t_obs, <span class="at">shape =</span> n, <span class="at">rate =</span> lambda_0)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  p_sup <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">pgamma</span>(t_obs, <span class="at">shape =</span> n, <span class="at">rate =</span> lambda_0)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  p_val <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">min</span>(p_inf, p_sup)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">min</span>(p_val, <span class="fl">1.0</span>))}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>A função pbinom calcula a cauda esquerda P(X &lt;= k). Para pegar a cauda direita P(X &gt;= x), usamos lower.tail = FALSE. Usamos ‘x - 1’ porque queremos incluir o próprio x na soma.</p>
 <hr>
 </section>
 <section id="probabilidade-a-posteriori" class="level2">
-<h2 class="anchored" data-anchor-id="probabilidade-a-posteriori">Probabilidade a Posteriori</h2>
-<p>Como já foi citado anteriormente, dada uma priori conjugada <span class="math inline">\(\theta \sim \text{Beta}(a, b)\)</span> e a verossimilhança Binomial, nossa distribuição a posteriori também é Beta, com os parâmetros:</p>
-<p><span class="math display">\[
-\theta | x \sim \text{Beta}(a + x, b + n - x)
-\]</span></p>
-<p>Com nossos valores já fixados (<span class="math inline">\(a=1, b=1, n=10\)</span>), então <span class="math inline">\(theta | x \sim \text{Beta}(1 + x, 1 + 10 - x)\)</span></p>
-<p>Queremos calcular <span class="math inline">\(P(\theta \in \Theta_0 | x)\)</span>, ou seja, área dessa curva que cai dentro da hipótese nula (<span class="math inline">\(\theta \le 0.5\)</span>)</p>
-<p><span class="math display">\[
-P(\theta \in \Theta_0 | x) = \int_{0}^{1/2} f(\theta | 1+x, 1+10-x)  d\theta
-\]</span></p>
-<p>No r:</p>
+<h2 class="anchored" data-anchor-id="probabilidade-a-posteriori">Probabilidade a posteriori</h2>
+<p>Como nosso <span class="math inline">\(H_0\)</span> é exatamente igual a 15, a probabilidade de uma Pareto ser exatamente 15 é 0 (porque temos uma v.a contínua).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a_post <span class="ot">&lt;-</span> a <span class="sc">+</span> x</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>b_post  <span class="ot">&lt;-</span> b <span class="sc">+</span> n <span class="sc">-</span> x</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>prob_post <span class="ot">&lt;-</span> <span class="fu">pbeta</span>(<span class="fl">0.5</span>, <span class="at">shape1 =</span> a_post, <span class="at">shape2 =</span> b_post)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>post_pontual <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="dv">0</span>)}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><em>pbeta</em> é a função de distribuição acumulada.</p>
+<hr>
 </section>
 <section id="e-valor" class="level2">
 <h2 class="anchored" data-anchor-id="e-valor">e-valor</h2>
+<p>Queremos calcular:</p>
 <p><span class="math display">\[
 \text{e-valor} = 1 - P(\theta \in T(x) | x)
 \]</span></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Moda da beta</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>moda <span class="ot">&lt;-</span> (a_post <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> (a_post <span class="sc">+</span> b_post <span class="sc">-</span> <span class="dv">2</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Correção para casos de borda </span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(x <span class="sc">==</span> <span class="dv">0</span>) moda <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(x <span class="sc">==</span> n) moda <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># FBST</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (moda <span class="sc">&lt;=</span> <span class="fl">0.5</span>) {</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Se a moda está em H0, evidência total a favor de H0</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  e_valor <span class="ot">&lt;-</span> <span class="dv">1</span>} </span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span> {</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Se a moda está fora, definimos o corte na fronteira</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  densidade_corte <span class="ot">&lt;-</span> <span class="fu">dbeta</span>(<span class="fl">0.5</span>, a_post, b_post)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  encontrar_raiz <span class="ot">&lt;-</span> <span class="cf">function</span>(t) {</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbeta</span>(t, a_post, b_post) <span class="sc">-</span> densidade_corte}</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(x <span class="sc">==</span> n) {</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>     prob_tangente <span class="ot">&lt;-</span> <span class="fu">pbeta</span>(<span class="dv">1</span>, a_post, b_post) <span class="sc">-</span> <span class="fu">pbeta</span>(<span class="fl">0.5</span>, a_post, b_post)} </span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>     limite_sup <span class="ot">&lt;-</span> <span class="fu">uniroot</span>(encontrar_raiz, <span class="at">interval =</span> <span class="fu">c</span>(moda, <span class="dv">1</span>))<span class="sc">$</span>root</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>     prob_tangente <span class="ot">&lt;-</span> <span class="fu">pbeta</span>(limite_sup, a_post, b_post) <span class="sc">-</span> <span class="fu">pbeta</span>(<span class="fl">0.5</span>, a_post, b_post)}</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  e_valor <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> prob_tangente}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>calcular_evalor <span class="ot">&lt;-</span> <span class="cf">function</span>(x_obs, n, lambda_0, alpha_pri, beta_pri) {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  dens_h0 <span class="ot">&lt;-</span> <span class="fu">dgamma</span>(lambda_0, <span class="at">shape =</span> alpha_post, <span class="at">rate =</span> beta_post)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  moda <span class="ot">&lt;-</span> (alpha_post <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> beta_post</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">abs</span>(lambda_0 <span class="sc">-</span> moda) <span class="sc">&lt;</span> <span class="fl">1e-6</span>) {</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fl">1.0</span>)}</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  f_dif <span class="ot">&lt;-</span> <span class="cf">function</span>(lambda) {</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dgamma</span>(lambda, <span class="at">shape =</span> alpha_post, <span class="at">rate =</span> beta_post) <span class="sc">-</span> dens_h0}</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  prob_conjunto_tangente <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (lambda_0 <span class="sc">&lt;</span> moda) {</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    limite_sup <span class="ot">&lt;-</span> <span class="fu">try</span>(<span class="fu">uniroot</span>(f_dif, <span class="at">interval =</span> <span class="fu">c</span>(moda, moda <span class="sc">+</span> <span class="dv">20</span>))<span class="sc">$</span>root, <span class="at">silent =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.numeric</span>(limite_sup)) limite_sup <span class="ot">&lt;-</span> <span class="cn">Inf</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    prob_conjunto_tangente <span class="ot">&lt;-</span> <span class="fu">pgamma</span>(limite_sup, alpha_post, beta_post) <span class="sc">-</span> </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">pgamma</span>(lambda_0, alpha_post, beta_post)}</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    limite_inf <span class="ot">&lt;-</span> <span class="fu">try</span>(<span class="fu">uniroot</span>(f_dif, <span class="at">interval =</span> <span class="fu">c</span>(<span class="fl">1e-10</span>, moda))<span class="sc">$</span>root, <span class="at">silent =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.numeric</span>(limite_inf)) limite_inf <span class="ot">&lt;-</span> <span class="dv">0</span> </span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    prob_conjunto_tangente <span class="ot">&lt;-</span> <span class="fu">pgamma</span>(lambda_0, alpha_post, beta_post) <span class="sc">-</span> </span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">pgamma</span>(limite_inf, alpha_post, beta_post)}</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  e_valor <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> prob_conjunto_tangente</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(e_valor)}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <hr>
 </section>
@@ -279,18 +281,22 @@ P(\theta \in \Theta_0 | x) = \int_{0}^{1/2} f(\theta | 1+x, 1+10-x)  d\theta
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Exercício1_files/figure-html/graf-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Exp-Gama_files/figure-html/graf-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
+</div>
+<p>Conseguimos ver que o RVG, o p-valor e o e-valor são parecidos, neles o pico ocorre exatamente em <span class="math inline">\(x \approx 6.67\)</span>, onde os dados são mais compatíveis com a hipótese nula.</p>
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Exercício1_files/figure-html/graf-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Exp-Gama_files/figure-html/graf_5-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+<p>Os pontos seguem a linha <span class="math inline">\(x=y\)</span>, ou seja, nesse caso, as duas métricas dão resultados muito próximos.</p>
 </section>
 
 </main>

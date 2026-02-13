@@ -1,0 +1,311 @@
+---
+title: "Modelo Poisson-Gama"
+format: html
+---
+
+## Introdução
+
+Queremos analisar o comportamento de diferentes estatísticas de teste sobre a taxa média $\lambda$ de uma população. Usaremos uma distribuição Poisson, onde buscaremos testar hipóteses sobre a taxa média $\lambda$.
+
+---
+
+## Definindo o modelo
+
+Seja $X_1, \dots, X_n$ v.a.c.i.i.d. tais que $X_i|\lambda \sim \text{Poisson}(\lambda)$. Nesse exercício fixaremos o tamanho da amostra em $n=5$.
+
+Para esse caso, a estatística suficiente é a soma das observações: $T(\mathbf{x}) = \sum_{i=1}^{5} X_i$.
+
+Para o modelo Poisson, a soma segue a distribuição:
+
+$$
+T(\mathbf{x}) \sim \text{Poisson}(n\lambda) = \text{Poisson}(5\lambda)
+$$
+
+A distribuição a priori conjugada para a média da Poisson é a Gama, vamos usar como parâmetros $\lambda \sim \text{Gama}(\alpha=2, \beta=1)$.
+
+A f.d.p. da priori é dada por 
+
+$$
+f(\lambda) = \frac{1^2}{\Gamma(2)}\lambda^{2-1}e^{-1\lambda} = \lambda e^{-\lambda}
+$$
+
+Consequêntemente, a distribuição a posteriori para um dado $x$ (onde $x = \sum X_i$) é
+
+$$
+\lambda | \mathbf{x} \sim \text{Gama}(\alpha_{post} = 2 + x, \, \beta_{post} = 1 + n = 6)
+$$
+---
+
+## Teste de Hipótese
+
+$$
+H_0: \lambda = 3 \quad \text{vs} \quad H_1: \lambda \neq 3
+$$
+
+Como $H_0$ diz que $\lambda=3$ e definimos $n=5$, nosso valor esperado da soma $T(\mathbf{x})$ é $3 \times 5 = 15$.
+
+Vamos estudar o comportamento das estatísticas de tese para uma sequência de valores $x$ (soma), em torno dessa média esperada (variando de 5 a 25), $x = \sum_{i=1}^5 \in \{5, 6, \cdots, 25 \}$.
+
+De maneira computacional:
+
+```{r seq}
+x <- seq(from = 5, to = 25, by = 1)
+```
+
+Para cada um desses valores possíveis de $x$, vamos calcular (e depois comparar) quatro medidas de estatística de teste:
+
+**1. RVG (Razão de Verossimilhança Generalizada) - $\lambda(x)$:** que é baseada na razão entre o supremo da verossimilhança sob $H_0$ e sob todo o espaço paramétrico.
+
+$$
+\lambda (x) = \frac{\displaystyle \sup_{\theta \in \Theta_0} f(x|\theta)}{\displaystyle \sup_{\theta \in \Theta} f(x|\theta)}
+$$
+
+**2. p-value:** é a probabilidade, sob $H_0$, de obter uma estatística de teste tão ou mais extrema que a observada.
+
+$$
+\sup_{\theta \in \Theta_0} P(X: \lambda(\mathbf{X} \leq \lambda(x)| \theta)
+$$
+
+**3. Probabilidade a Posteriori ($P(\theta \in \Theta_0|\mathbf{x})$):** A probabilidade direta da hipótese nula ser verdadeira dado os dados. 
+
+**4. e-value:**
+
+$$
+Ev(\Theta_0 | x) = 1 - P(\theta \in T_x | x)
+$$
+
+Com
+
+$$
+ T_x = \{ \theta : f(\theta | \mathbf{x} \geq
+\sup_{\theta \in \Theta_0} f(\theta | x) \}
+$$
+
+Ao final, depois de mostrar a parte computacional (como calcular cada valor no R), mostraremos a evolução dessas medidas graficamente, ou seja, como cada abordagem reage a variação da nossa estatística suficiente,
+
+---
+
+Definindo nossos parâmetros iniciais
+
+```{r parametros}
+n <- 5
+lambda_0 <- 3           
+mu_H0 <- n * lambda_0
+
+# Priori Gama(2, 1)
+alpha_prior <- 2
+beta_prior <- 1
+```
+
+---
+
+## RVG
+
+Para calcular a RVG usamos a Estimativa de Máxima Verossimilhança (EMV), que é dada por $\hat{\lambda} = x/n$. 
+
+A razão de verossimilhança é calculada por:
+
+$$
+\lambda (x) = \frac{\displaystyle \sup_{\theta \in \Theta_0} f(x|\theta)}{\displaystyle \sup_{\theta \in \Theta} f(x|\theta)}
+$$
+
+Onde:
+
+Considerando $H_0: \lambda = 3$ e $n=5$, o processo é:
+
+- Denominador: Ocorre na EMV, como $n=5 \Rightarrow \hat{\lambda} = x/5$.
+
+- Numerador: Como nossa hipótese nula tem apenas um ponto ($\lambda = 3$), o $\Theta_0$ contem apenas o valor 3. O máximo (supremo) é a verossimilhança calculada em $\lambda = 3$.
+
+$$
+\lambda(x) = \frac{V(3)}{V(x/5)} = \frac{e^{-5(3)} \cdot 3^x}{e^{-5(x/5)} \cdot (x/5)^x}
+$$
+
+Nesse caso, a RVG só será igual a 1 se a média amostral for exatamente 3 ($x=15$). Para qualquer outro valor, $\lambda(x) < 1$.
+
+---
+
+## p-valor
+
+Para esse teste, o p-valor representa a probabilidade de observarmos uma soma total de eventos tão ou mais extrema que a observada ($x$), assumindo que a hipótese nula é verdadeira.
+
+Sob $H_0$, a estatística suficiente $T(\mathbf{X}) = \sum X_i$ segue uma distribuição Poisson com média $\mu = n \lambda_0 = 5 \times 3 = 15$:
+
+$$
+T(\mathbf{X}) \sim \text{Poisson}(15)
+$$
+
+Como nosso teste é bicaudal, consideramos ruins valores distantes de 15.
+
+Computacionalmente:
+
+```{r p_valor, eval = FALSE}
+teste <- poisson.test(x, T = 5, r = 3, alternative = "two.sided")
+p_valor <- teste$p.value
+```
+
+Usamos a função *poisson.test*, que calcula o p-valor exato para testes em distribuições Poisson.
+
+---
+
+## Probabilidade a posteriori
+
+Como citamos, a distribuição a posteriori do parâmetro $\lambda$ também é uma Gama, com os parâmetros atualizados:
+
+$$
+\lambda | x \sim \text{Gama}(\alpha_{post} = 2 + x, \, \beta_{post} = 6)
+$$
+
+Como nosso $H_0$ é exatamente igual a 3, a probabilidade de uma Gama ser exatamente 3 é 0 (porque temos uma v.a contínua).
+
+$$
+P(\lambda = 3 | x) = \int_{3}^{3} f(\lambda|x) d\lambda = 0
+$$
+
+No R:
+
+```{r post, eval = FALSE}
+post_pontual <- function() {
+  return(0)}
+```
+
+---
+
+## e-value
+
+Queremos calcular:
+
+$$
+\text{e-valor} = 1 - P(\theta \in T(x) | x) 
+$$
+
+```{r e-value, eval = FALSE}
+calc_evalue <- function(t, n, lambda0, alpha_pri, beta_pri) {
+  alpha_post <- 2 + t
+  beta_post <- 1 + n
+  
+  densidade_ref <- dgamma(lambda0, shape = alpha_post, rate = beta_post)
+  
+  # Moda 
+  moda <- (alpha_post - 1) / beta_post
+  
+  # Se o ponto H0 for exatamente a moda, e-valor = 1
+  if (abs(lambda0 - moda) < 1e-4) return(1)
+  
+  f_dif <- function(x) { 
+    dgamma(x, shape = alpha_post, rate = beta_post) - densidade_ref}
+  
+  tryCatch({
+    limite_inf <- uniroot(f_dif, interval = c(0, moda))$root
+    limite_sup <- uniroot(f_dif, interval = c(moda, moda + 20))$root
+    prob_Tx <- pgamma(limite_sup, shape = alpha_post, rate = beta_post) - 
+               pgamma(limite_inf, shape = alpha_post, rate = beta_post)
+
+    return(1 - prob_Tx)}
+```
+
+---
+
+## Gráficos 
+
+```{r dados, echo=FALSE, warning=FALSE}
+library(ggplot2)
+library(patchwork)
+
+n <- 5
+lambda_0 <- 3          
+mu_H0 <- n * lambda_0   
+x_seq <- 5:25 
+alpha_prior <- 2
+beta_prior <- 1
+
+resultados <- data.frame(
+  x = x_seq,
+  RVG = NA,
+  p_valor = NA,
+  Posteriori = NA,
+  e_valor = NA)
+
+for (i in 1:length(x_seq)) {
+  x_loop <- x_seq[i]
+  
+  # RVG
+  theta_hat <- x_loop / n  
+  log_L_H0 <- dpois(x_loop, lambda = n * lambda_0, log = TRUE)
+  log_L_Global <- dpois(x_loop, lambda = n * theta_hat, log = TRUE)
+  resultados$RVG[i] <- exp(log_L_H0 - log_L_Global)
+  
+  # p-valor
+  teste <- poisson.test(x_loop, T = n, r = lambda_0, alternative = "two.sided")
+  resultados$p_valor[i] <- teste$p.value
+  
+  # Posteriori 
+  resultados$Posteriori[i] <- 0
+  
+  # e-valor 
+  alpha_post <- alpha_prior + x_loop
+  beta_post <- beta_prior + n 
+
+  densidade_corte <- dgamma(lambda_0, shape = alpha_post, rate = beta_post)
+  moda_post <- (alpha_post - 1) / beta_post
+  f_busca <- function(t) dgamma(t, alpha_post, rate = beta_post) - densidade_corte
+
+  if (abs(moda_post - lambda_0) < 0.01) {
+    resultados$e_valor[i] <- 1} 
+  else {
+    raiz_esq <- try(uniroot(f_busca, interval = c(0.0001, moda_post))$root, silent=TRUE)
+    raiz_dir <- try(uniroot(f_busca, interval = c(moda_post, moda_post + 30))$root, silent=TRUE)
+    
+    if(!inherits(raiz_esq, "try-error") & !inherits(raiz_dir, "try-error")) {
+      prob_tangente <- pgamma(raiz_dir, alpha_post, rate=beta_post) - 
+                       pgamma(raiz_esq, alpha_post, rate=beta_post)
+      resultados$e_valor[i] <- 1 - prob_tangente} 
+    else {
+      resultados$e_valor[i] <- 0}}}
+```
+
+
+```{r graf, echo=FALSE, warning=FALSE}
+tema <- theme_bw() + theme(panel.grid.minor = element_blank())
+
+# Gráfico 1: RVG
+g1 <- ggplot(resultados, aes(x=x, y=RVG)) + 
+  geom_line(color="blue", size=1) + geom_point() +
+  scale_x_continuous(breaks=seq(5,25,2)) +
+  labs(title="RVG", y=expression(lambda(x))) + tema
+
+# Gráfico 2: p-valor
+g2 <- ggplot(resultados, aes(x=x, y=p_valor)) + 
+  geom_line(color="deeppink", size=1) + geom_point() +
+  geom_hline(yintercept=0.05, linetype="dashed", color="gray") +
+  scale_x_continuous(breaks=seq(5,25,2)) +
+  labs(title="p-valor", y="p-valor") + tema
+
+# Gráfico 3: Posteriori
+g3 <- ggplot(resultados, aes(x=x, y=Posteriori)) + 
+  geom_line(color="green4", size=1) + geom_point() +
+  scale_x_continuous(breaks=seq(5,25,2)) +
+  labs(title="Probabilidade Posteriori", subtitle="Sempre 0 para H0 pontual contínuo", y="P(H0|x)") + tema
+
+# Gráfico 4: e-valor
+g4 <- ggplot(resultados, aes(x=x, y=e_valor)) + 
+  geom_line(color="purple", size=1) + geom_point() +
+  scale_x_continuous(breaks=seq(5,25,2)) +
+  labs(title="e-valor", y="ev(H0|x)") + tema
+
+(g1 + g2) / (g3 + g4)
+```
+
+As três medidas RVG, p-valor e e-valor possuem um formado de sino e atingem o valor máximo (1) em $x=15$ (valor esperado sob a hipótese nula), indicando consistência com a hipótese
+
+```{r graf_5, echo=FALSE, warning=FALSE}
+# Gráfico 5: Dispersão p-valor vs e-valor 
+g5 <- ggplot(resultados, aes(x=p_valor, y=e_valor)) +
+  geom_point(size=3, color = "black") + 
+  geom_abline(slope=1, intercept=0, linetype="dashed", color = "gray", size=1) + 
+  labs(title="p-valor vs e-valor") + tema
+
+print(g5)
+```
+
+Essa dispersão de dados ocorre porque tanto a distribuição de Poisson quanto a Gama são assimétricas. Mas apesar da dispersão há uma correlação positiva nas extremidade (prox de 0 e 1).

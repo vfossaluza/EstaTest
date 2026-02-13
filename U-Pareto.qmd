@@ -1,0 +1,282 @@
+---
+title: "Modelo Uniforme-Pareto"
+format: html
+---
+
+## Introdução
+
+Queremos analisar o comportamento de diferentes estatísticas de teste em um cenário onde o domínio da v.a depende do parâmetro desconhecido $\theta$. Para isso, usaremos a distribuição Uniforme $U(0, \theta)$.
+
+---
+
+## Definindo o modelo
+
+Seja $X_1, \dots, X_n$ v.a.c.i.i.d. tal que $X_i|\theta \sim \text{Uniforme}(0, \theta)$. A densidade é $f(x|\theta) = 1/\theta$ para $0 \le x \le \theta$. Vamos fixar o tamnho da amostra em $n=8$.
+
+Nesse caso, a estatística suficiente para $\theta$ é o máximo valor observado:
+
+$$
+T(\mathbf{x}) = \max(X_1, \dots, X_n)
+$$
+Ou seja, o parâmetro $\theta$ deve ser necessariamente maior ou igual ao maior valor observado ($\theta \ge T(\mathbf{x})$). 
+
+Suponha que a priori para o limite da Uniforme tenha uma distribuição Pareto. Também fixaremos seus parâmetros: $\theta \sim \text{Pareto}(\alpha=3, x_m=10)$. Para $\theta \ge 10$ sua f.d.p. é:
+
+$$
+\pi(\theta) = \frac{\alpha x_m^\alpha}{\theta^{\alpha+1}}
+$$
+
+Consequentemente, a distribuição a posteriori também é uma Pareto, com parâmetros: $\alpha_{post} = \alpha + n = 3 + 8 = 11$ e $x_{m, post} = \max(x_m, T(\mathbf{x})) = \max(10, \max(X_i))$
+
+Ou seja, $\theta | \mathbf{x} \sim \text{Pareto}(11, \max(10, x))$.
+
+---
+
+## Teste de Hipótese
+
+Deseja-se testar:
+
+$$
+H_0: \theta = 15 \quad \text{vs} \quad H_1: \theta \neq 15
+$$
+
+Diferente das distribuições anteriores, a verossimilhança da Uniforme cai para zero abruptamente. Se o máximo observado for maior que 15 ($x > 15$), a hipótese nula é impossível. Neste caso, RVG, p-valor e e-valor devem ser zero.  sequência de estudo variará de 10 (mínimo da priori) até 16, para visualizar essa "queda no abismo" quando $x$ cruza o valor 15.
+
+Vamos estudar o comportamento das estatísticas de teste para uma sequência de valores $x$ (máximo), variando de 10 (mínimo da priori) a 16, $x \in \{10, \cdots, 16 \}$.
+
+Para cada um desses valores possíveis de $x$, vamos calcular (e depois comparar) quatro medidas de estatística de teste:
+
+**1. RVG (Razão de Verossimilhança Generalizada) - $\lambda(x)$:** que é baseada na razão entre o supremo da verossimilhança sob $H_0$ e sob todo o espaço paramétrico.
+
+$$
+\lambda (x) = \frac{\displaystyle \sup_{\theta \in \Theta_0} f(x|\theta)}{\displaystyle \sup_{\theta \in \Theta} f(x|\theta)}
+$$
+
+**2. p-value:** é a probabilidade, sob $H_0$, de obter uma estatística de teste tão ou mais extrema que a observada.
+
+$$
+\sup_{\theta \in \Theta_0} P(X: \lambda(\mathbf{X} \leq \lambda(x)| \theta)
+$$
+
+**3. Probabilidade a Posteriori ($P(\theta \in \Theta_0|\mathbf{x})$):** A probabilidade direta da hipótese nula ser verdadeira dado os dados. 
+
+**4. e-value:**
+
+$$
+Ev(\Theta_0 | x) = 1 - P(\theta \in T_x | x)
+$$
+
+Com
+
+$$
+ T_x = \{ \theta : f(\theta | \mathbf{x} \geq
+\sup_{\theta \in \Theta_0} f(\theta | x) \}
+$$
+
+Ao final, depois de mostrar a parte computacional (como calcular cada valor no R), mostraremos a evolução dessas medidas graficamente, ou seja, como cada abordagem reage a variação da nossa estatística suficiente,
+
+--- 
+
+Definindo os nossos parâmetros:
+
+```{r parametros, eval = FALSE}
+n <- 8
+theta_H0 <- 15
+x_seq <- seq(10, 16, by = 0.5)
+
+alpha_priori <- 2
+beta_priori  <- 1
+
+alpha_post <- alpha_priori + n       
+beta_post  <- max(beta_priori, max_x)
+```
+
+---
+
+## RVG
+
+Nesse caso, a Estimativa de Máxima Verossimilhança (EMV) é $\hat{\theta} = x$ (máximo da amostra).
+
+A razão de verossimilhança é calculada por:
+
+$$
+\lambda (x) = \frac{\displaystyle \sup_{\theta \in \Theta_0} f(x|\theta)}{\displaystyle \sup_{\theta \in \Theta} f(x|\theta)}
+$$
+
+Onde:
+
+- Denominador é o máximo de $\Theta$, dado em $\frac{1}{x^n}$.
+
+- Numerador é o máximo de $\Theta_0$. Como a hipótese nula é $\theta=15$, temos duas opções:
+
+**1 - ($x \le 15$):** O valor 15 é possível. A verossimilhança é $V(15) = 1/15^n$.
+
+**2 - ($x > 15$):** O valor 15 tornou-se impossível, então a verossimilhança é $0$.
+
+Temos então:
+
+$$
+\lambda(x) = \frac{L(15)}{L(x)} = \frac{1/15^n}{1/x^n} = \left( \frac{x}{15} \right)^n
+$$
+
+Como temos $n=8$:
+
+$$
+\lambda(x) = \begin{cases} 
+\left( \frac{x}{15} \right)^8 & \text{se } x \le 15 \\
+0 & \text{se } x > 15 
+\end{cases}
+$$
+
+---
+
+## p-valor
+
+O p-valor avalia a probabilidade de observar um valor máximo ($x_{max}$) tão ou mais "extremo" que o da sua amostra, assumindo que $\theta = 15$.
+
+Se o $x_{max} \le 15$ a probabilidade de que todos os 8 elementos da amostra sejam menores ou iguais a um valor $x$ é:
+
+$$
+P(X_{max} \le x) = \left( \frac{x}{15} \right)^n
+$$
+
+Já se algum valor na amostra for maior que 15, a probabilidade disso acontecer sob a hipótese nula ($\theta=15$) é zero. Logo, o p-valor é 0.
+
+
+```{r p_val, eval = FALSE}
+pval <- function(x_max, n, theta_0) {
+
+  if (x_max > theta_0) {
+    return(0)} 
+
+  prob_acumulada <- (x_max / theta_0)^n
+  p_val <- 2 * min(prob_acumulada, 1 - prob_acumulada)
+  return(min(p_val, 1))}
+```
+
+---
+
+## Probabilidade a posteriori
+
+Como nosso $H_0$ é exatamente igual a 15, a probabilidade de uma Pareto ser exatamente 15 é 0 (porque temos uma v.a contínua).
+
+```{r post, eval = FALSE}
+post_pontual <- function() {
+  return(0)}
+```
+
+---
+
+## e-valor
+
+Queremos calcular:
+
+$$
+\text{e-valor} = 1 - P(\theta \in T(x) | x) 
+$$
+
+
+```{r e_val, eval = FALSE}
+if (theta_0 < beta_post) {
+  e_valor <- 0} 
+else {
+  e_valor <- (beta_post / theta_0) ^ alpha_post}
+```
+
+---
+
+## Gráficos
+
+```{r dados, echo = FALSE, warning = FALSE}
+library(ggplot2)
+library(patchwork)
+
+n <- 8
+theta_0 <- 15        
+xm_prior <- 10        
+alpha_prior <- 3      
+x_seq <- seq(from = 10, to = 16, by = 0.2)
+
+
+resultados <- data.frame(
+  x = x_seq,
+  RVG = NA,
+  p_valor = NA,
+  Posteriori = NA,
+  e_valor = NA)
+
+for (i in 1:length(x_seq)) {
+  x_loop <- x_seq[i]
+  
+  # RVG 
+  lik_global <- (x_loop)^(-n)
+
+  if (x_loop > theta_0) {
+    resultados$RVG[i] <- 0} 
+  else {
+    lik_H0 <- (theta_0)^(-n)
+    resultados$RVG[i] <- lik_H0 / lik_global}
+  
+  # p-valor
+  
+  if (x_loop > theta_0) {
+    resultados$p_valor[i] <- 0} 
+  else {
+    prob_acumulada <- (x_loop / theta_0)^n
+    resultados$p_valor[i] <- 2 * min(prob_acumulada, 1 - prob_acumulada)}
+  
+  # Posteriori
+  resultados$Posteriori[i] <- 0
+  
+  # e-valor 
+  alpha_post <- alpha_prior + n   
+  xm_post <- max(xm_prior, x_loop) 
+  
+  if (x_loop > theta_0) {
+    resultados$e_valor[i] <- 0} 
+  else {
+    prob_cauda_15 <- (xm_post / theta_0)^alpha_post
+    resultados$e_valor[i] <- prob_cauda_15}}
+```
+
+
+```{r graf, echo = FALSE, warning = FALSE}
+tema <- theme_bw() + theme(panel.grid.minor = element_blank())
+
+# Gráfico 1: RVG
+g1 <- ggplot(resultados, aes(x=x, y=RVG)) + 
+  geom_line(color="blue", size=1) + geom_point(size=1) +
+  labs(title="RVG", y=expression(lambda(x))) + tema
+
+# Gráfico 2: p-valor
+g2 <- ggplot(resultados, aes(x=x, y=p_valor)) + 
+  geom_line(color="deeppink", size=1) + geom_point(size=1) +
+  geom_hline(yintercept=0.05, linetype="dashed", color="gray") +
+  labs(title="p-valor", y="p-valor") + tema
+
+# Gráfico 3: Posteriori
+g3 <- ggplot(resultados, aes(x=x, y=Posteriori)) + 
+  geom_line(color="green4", size=1) + geom_point(size=1) +
+  labs(title="Posteriori (H0 Pontual)", y="P(H0|x)") + tema
+
+# Gráfico 4: e-valor
+g4 <- ggplot(resultados, aes(x=x, y=e_valor)) + 
+  geom_line(color="purple", size=1) + geom_point(size=1) +
+  labs(title="e-valor (FBST)", y="ev(H0|x)") + tema
+
+(g1 + g2) / (g3 + g4)
+```
+
+O RVG, o p-valor e o e-valor possuem uma forma parecida, a medida aumenta conforme o dado observado ($x$) se aproxima de 15, atingindo o máximo em $x=15$. Assim que $x > 15$, ela cai para 0.
+
+```{r graf_5, echo = FALSE, warning = FALSE}
+# Gráfico 5: Dispersão p-valor vs e-valor 
+g5 <- ggplot(resultados, aes(x=p_valor, y=e_valor)) +
+  geom_point(size=3, color = "black") + 
+  geom_abline(slope=1, intercept=0, linetype="dashed", color = "gray", size=1) + 
+  labs(title="p-valor vs e-valor", subtitle="Modelo Uniforme-Pareto") + tema
+
+print(g5)
+```
+
+A maioria dos pontos está abaixo da linha pontilhada ($y=x$), com isso, podemos ver que, nesse caso, o e-valor tende a ser menor que o p-valor. Para uma mesma amostra, o e-valor diz que há menos evidência a favor de $H_0$ do que o p-valor sugere. Mas, apesar da diferença, quando o p-valor sobre, o e-valor também sobe.
