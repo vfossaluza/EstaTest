@@ -1,0 +1,143 @@
+---
+title: "Estatísticas de Testes de Hipóteses: Teoria e Aplicações"
+author: "Orientanda: Gabriela Aimee Scarpini Silva
+          Orientador: Victor Fossaluza"
+format: pdf
+---
+
+**RASCUNHOOO!!! NÃO ESTÁ PRONTOOOO!!**
+
+--- 
+
+## 1. Introdução 
+
+
+---
+
+## 2. Desenvolvimento
+
+Nesta pesquisa, abordaremos quatro medidas de Estatísticas de Teste e, através de exemplos, compararemos as medidas para avaliar a consistência das conclusões.
+
+### 2.1. Estatísticas de Teste
+
+Seja $\mathbf{X} = (X_1, X_2, \dots, X_n)$ variáveis aleatórias independentes e identicamente distribuidas, com $f(\mathbf{x} | \theta)$, onde $\theta \in \Theta$. 
+
+Consideramos o teste de hipótese **(COLOCO H_0 PONTUAL?????)**
+
+$$
+H_0: \theta = \theta_0 \\ 
+H_1: \theta \neq \theta_0
+$$
+
+#### 2.1.1. Razão de Verossimilhança Generalizada (RVG)
+
+A RVG é uma ferramenta da estatística frequentista usada para medir o quão provável são os dados sob $H_0$, em relação ao panorama de máximo verossimilhança global ($sup_{\Theta} L_x(\theta)$).
+
+Seja $L_x(\theta)$ a função de verossimilhança da nossa amostra $\mathbf{X}$, definida sobre o espaço paramétrico $\Theta$. A RGV é definida por:
+
+$$
+W(x) = \frac{sup_{\Theta_0} L_x(\theta)}{sup_{\Theta} L_x(\theta)}
+$$
+
+O denominador representa o valor máximo da função de verossimilhança ($\hat{\theta}$). Por definição, a RVG $\in (0, \, 1]$. Sendo igual a 1 somente quando $\theta = \hat{\theta}$.
+
+#### 2.1.2. p-value
+
+Dada uma estatística de teste $W(\mathbf{X})$, o *p-value* é definido como a probabilidade, sob $H_0$, de se observar um valor da estatística de teste tão extremo quanto aquele de fato observado ($W(x)$):
+
+$$
+p(x) = sup_{\Theta_0} P(W(X) \leq W(x) | \theta)
+$$
+
+*p-values* pequenos mostram que o resultado observado seria improvável caso $H_0$ fosse verdadeira. Em contrapartida, *p-values* altos sugerem que os dados são compatíveis com $H_0$. 
+
+**(FALAR SOBRE O NÍVEL DE SIGNIFICANCIA????)**
+
+#### 2.1.3. Probabilidade a posteriori de H
+
+A probabilidade a posteriori da Hipótese $H$ é obtida por 
+
+$$
+\pi(x) = P(\theta \in \Theta_0 | x) = \int_{\Theta_0} \pi (\theta | x) d \theta
+$$
+
+A posteriori de H é a atualização da crença inicial, ponderada pela evidência fornecida pelos dados. Diferente do *p-value*, essa quantidade possui uma interpretação de probabilidade mais clara, uma vez que, evidencia a probabilidade de a hipótese ser verdadeira, condicionada aos dados observados. **(É POR ISSO QUE POSTERIORI PODE SER CONSIDERADO UM ESTAT DE TESTE?? ACRESCENTAR ISSO?)**
+
+Valores altos de $\pi(x)$ mostram forte evidência empírica a favor de $H_0$, enquanro valores baicos sugerem que $H_0$ é pouco plausível.
+
+Para uma hipótese pontual em parâmetros contínuos, a probabilidade a posteriori é nula:
+
+$$
+\int_{\theta_0}^{\theta_0} f(\theta | \mathbf{x}) d\theta = 0
+$$
+
+#### 2.1.4 e-value (Full Bayesian Significance Test - FBST)
+
+Usando a abordagem bayesiana, o FBST (procedimento de Pereira-Stern) é uma medida de evidência para testar uma hipótese precisa.
+
+Definimos a região $T_x$ como 
+
+**(USAR T(X) OU T_x??)**
+
+$$
+T_x = \{ \theta \in \Theta : f(\theta | x) > sup_ {\Theta_0} f(\theta | x) \}
+$$
+
+A partir disso, definimos o *e-value*:
+
+**(USAR Ev(X) OU e(x)??)**
+
+$$
+Ev(x) = 1 - P(\theta \in T_x | x)
+$$
+
+**(PERGUNTAR SOBRE O e(x) DO DOCUMENTO)**
+
+Um *e-value* grande indica ausência de evidência contra $H_0$.
+
+
+### 2.2. Exemplos de modelos
+
+#### 2.2.1 Modelos para Dados Discretos
+
+**Bernoulli-Beta:**
+
+Analisamos $X_i \sim \text{Ber}(\theta)$ com $\theta \sim \text{Beta}(a, b)$. A posterior é $\text{Beta}(a + \sum x_i, b + n - \sum x_i)$.
+ 
+**(Não sei qual interpretação colocar)**
+
+**Poisson-Gama:**
+
+Para $X_i \sim \text{Pois}(\lambda)$ com $\lambda \sim \text{Gama}(\alpha, \beta)$, a posterior é $\text{Gama}(\alpha + \sum x_i, \beta + n)$. 
+
+#### 2.2.2 Modelos para Dados Contínuos
+
+**Exponencial-Gama:**
+Teste sobre o tempo de vida médio. Não esquecer de citar que as métricas apresentaram alta concordância visual e correlação próxima à linha $x=y$. 
+
+**Uniforme-Pareto:**
+É legal citar que a estatística suficiente nesse caso é o máximo (diferente dos outros exemplos). Falar também da queda da evidência quando o máximo observado $x$ ultrapassa o valor da hipótese nula $\theta_0$.
+
+---
+
+## 3. Análise Comparativa e Resultados
+
+Resumir o que os gráficos de dispersão (e-value vs p-valor) mostram: Nos modelos Bernoulli, Poisson e Exponencial, houve forte correlação entre as medidas, já no modelo Uniforme, o e-valor tendeu a ser mais conservador (menor) que o p-valor.
+
+---
+
+## 4. Conclusão e Próximos Passos
+
+Para a parte da conclusão dizer que a (RVG), o p-valor e o e-valor atingem seu pico de evidência (valor 1) simultaneamente quando os dados observados coincidem com o valor esperado sob a hipótese nula $H_0$.
+
+E que os gráficos de dispersão mostram uma correlação positiva clara, indicando que quando o p-valor é pequeno (rejeição estatística), o e-valor também o é.
+
+Já para os próximos passos são aplicar os testes em um banco de dados reais vindos do CEA. 
+
+Sugestão de próximos passos: Expandir para modelos de dois parâmetros (ex: Normal com média e variância desconhecidas).
+
+---
+
+## Bibliografia 
+
+
