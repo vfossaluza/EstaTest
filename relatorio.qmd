@@ -1,143 +1,584 @@
 ---
 title: "Estatísticas de Testes de Hipóteses: Teoria e Aplicações"
-author: "Orientanda: Gabriela Aimee Scarpini Silva
-          Orientador: Victor Fossaluza"
+author: 
+    - name: "Gabriela Aimee Scarpini Silva"
+    - name: "Orientador: Victor Fossaluza"
 format: pdf
 ---
 
-**RASCUNHOOO!!! NÃO ESTÁ PRONTOOOO!!**
-
---- 
-
 ## 1. Introdução 
 
+A inferência estatística concentra-se em dois tipos de problemas: estimação e teste de
+hipóteses, sendo o último o foco deste trabalho. Uma *hipótese estatística* é uma afirmação sobre um parâmetro $\theta$. Um teste de hipóteses consiste em um problema de decisão, em que deve-se escolher uma entre duas (ou mais) hipóteses. No caso mais comum da prática estatística, em que tem-se duas hipóteses, o espaço paramétrico é dividido em subconjuntos complementares, $\Theta_0$ e $\Theta_1 = \Theta_0^c$.  Às afirmações $H_0 : \theta \in \Theta_0$ e $H_1 : \theta \in \Theta_0^c$ dá-se o nome de *hipótese nula* e *hipótese alternativa*, respectivamente.
+
+Um **teste de hipóteses** $\varphi : \mathfrak{X} \rightarrow \{0, \, 1 \}$ é uma regra de decisão que especifica para quais pontos $x \in \mathcal{X}$ a hipótese $H_0: \theta \in \Theta_0$ deve ser rejeitada ($\varphi (x) = 1$) ou aceita ($\varphi (x) = 0$). O subconjunto do espaço amostral $\mathcal{X}$ que contém os pontos que levam à rejeição de $H_0$ ($\varphi^{-1} (\{ 1 \})$) é chamada *região crítica* (RC) ou *região de rejeição* do teste $\varphi$.
+
+A região crítica pode ser expressa por meio de uma **estatística de teste**, $W(X)$, que, em geral, é função de uma estatística suficiente. Essa estatística é utilizada para ordenar o espaço amostral de modo que grandes valores de $W$ indicam pontos mais favoráveis à $H_0 : \theta \in \Theta_0$.
+
+Nesta pesquisa, abordaremos quatro medidas de estatísticas de teste e, através de exemplos, compararemos as medidas para avaliar a consistência das conclusões.
 
 ---
 
-## 2. Desenvolvimento
+## 2. Estatísticas de Teste
 
-Nesta pesquisa, abordaremos quatro medidas de Estatísticas de Teste e, através de exemplos, compararemos as medidas para avaliar a consistência das conclusões.
+Seja $\mathbf{X} = (X_1, X_2, \dots, X_n)$ variáveis aleatórias condicionalmente independentes e identicamente distribuidas (v.a. c.i.i.d.), com função de densidade de probabilidade ou função de probabilidade (f.d.p) $f(\mathbf{x} | \theta)$, em que $\theta \in \Theta$. 
 
-### 2.1. Estatísticas de Teste
-
-Seja $\mathbf{X} = (X_1, X_2, \dots, X_n)$ variáveis aleatórias independentes e identicamente distribuidas, com $f(\mathbf{x} | \theta)$, onde $\theta \in \Theta$. 
-
-Consideramos o teste de hipótese **(COLOCO H_0 PONTUAL?????)**
+Consideramos o teste de hipótese
 
 $$
-H_0: \theta = \theta_0 \\ 
-H_1: \theta \neq \theta_0
+H_0: \theta \in \Theta_0 \, \text{ contra } \, H_1: \theta \neq \theta_0^c 
 $$
 
-#### 2.1.1. Razão de Verossimilhança Generalizada (RVG)
+com $\Theta_0 \subseteq \Theta$.
 
-A RVG é uma ferramenta da estatística frequentista usada para medir o quão provável são os dados sob $H_0$, em relação ao panorama de máximo verossimilhança global ($sup_{\Theta} L_x(\theta)$).
+Uma estatística de teste $W : \mathfrak{X} \rightarrow \mathbb{R}$ é uma função do espaço amostral que sumariza as evidências contidas na amostra em um único valor numérico, permitindo analisar a compatibilidade dos dados com $H_0$.
 
-Seja $L_x(\theta)$ a função de verossimilhança da nossa amostra $\mathbf{X}$, definida sobre o espaço paramétrico $\Theta$. A RGV é definida por:
 
-$$
-W(x) = \frac{sup_{\Theta_0} L_x(\theta)}{sup_{\Theta} L_x(\theta)}
-$$
+### 2.1 Razão de Verossimilhança Generalizada (RVG)
 
-O denominador representa o valor máximo da função de verossimilhança ($\hat{\theta}$). Por definição, a RVG $\in (0, \, 1]$. Sendo igual a 1 somente quando $\theta = \hat{\theta}$.
+A função de verossimilhança desempenha papel fundamental nas diferentes escolas de inferência estatística e é definida por $V_x : \Theta \rightarrow \mathbb{R}$, $V_x(\theta) = f(x | \theta)$.
 
-#### 2.1.2. p-value
-
-Dada uma estatística de teste $W(\mathbf{X})$, o *p-value* é definido como a probabilidade, sob $H_0$, de se observar um valor da estatística de teste tão extremo quanto aquele de fato observado ($W(x)$):
+Sob o enfoque bayesiano, a incerteza sobre o parâmetro $\theta$ é descrita em termos de uma distribuição de probabilidade $f(\theta)$, chamada distribuição a priori. Essa incerteza é atualizada após a distribuição de $\mathbf{X} = \mathbf{x}$ via Teorema de Bayes
 
 $$
-p(x) = sup_{\Theta_0} P(W(X) \leq W(x) | \theta)
+f(\theta | x) = \frac{f(x | \theta) f(\theta)}
+{f(x)} 
+\propto
+V_x(\theta) f(\theta)
+$$
+
+A RVG é uma ferramenta da estatística frequentista usada para medir quanto $H_0$ é suportado pelos dados observados, em relação ao panorama de máximo verossimilhança global ($\sup_{\Theta} V_x(\theta)$).
+
+Seja $V_x(\theta)$ a função de verossimilhança da nossa amostra $\mathbf{X}$, definida sobre o espaço paramétrico $\Theta$. A RVG é definida por:
+
+$$
+\lambda(x) = \frac{\sup_{\Theta_0} V_x(\theta)}{\sup_{\Theta} V_x(\theta)}
+$$
+
+O denominador representa o valor máximo da função de verossimilhança, ou seja, o valor de $V_x(\theta)$ calculada no Estimador de Máximo Verossimilhança (EMV) $\hat{\theta}_{MV}$ e o numerador é o máximo sob $H_0$. Por definição, a RVG $\in (0, \, 1]$. Sendo igual a 1 somente quando $\hat{\theta}_{MV} \in \Theta_0$.
+
+### 2.2. p-value
+
+Dada uma estatística de teste $W(\mathbf{X})$, o *p-value* é definido como a maior probabilidade, sob $H_0$, de se observar um valor da estatística de teste mais desfavoráveis à hipótese nula que aquele de fato observado ($W(x)$):
+
+$$
+p(x) = \sup_{\Theta_0} P(W(X) \leq W(x) | \theta).
 $$
 
 *p-values* pequenos mostram que o resultado observado seria improvável caso $H_0$ fosse verdadeira. Em contrapartida, *p-values* altos sugerem que os dados são compatíveis com $H_0$. 
 
-**(FALAR SOBRE O NÍVEL DE SIGNIFICANCIA????)**
+### 2.3 Probabilidade a posteriori de $H_0$
 
-#### 2.1.3. Probabilidade a posteriori de H
-
-A probabilidade a posteriori da Hipótese $H$ é obtida por 
+A probabilidade a posteriori da Hipótese $H_0$ é obtida por 
 
 $$
-\pi(x) = P(\theta \in \Theta_0 | x) = \int_{\Theta_0} \pi (\theta | x) d \theta
+\pi(x) = P(\theta \in \Theta_0 | x) = \int_{\Theta_0} f (\theta | x) d \theta
 $$
 
-A posteriori de H é a atualização da crença inicial, ponderada pela evidência fornecida pelos dados. Diferente do *p-value*, essa quantidade possui uma interpretação de probabilidade mais clara, uma vez que, evidencia a probabilidade de a hipótese ser verdadeira, condicionada aos dados observados. **(É POR ISSO QUE POSTERIORI PODE SER CONSIDERADO UM ESTAT DE TESTE?? ACRESCENTAR ISSO?)**
+A estatística acima é a atualização da crença inicial sobre a hipótese de $H_0$, baseada na evidência fornecida pelos dados. Diferente do *p-value*, essa quantidade possui uma interpretação de probabilidade mais clara, uma vez que, evidencia a probabilidade de a hipótese ser verdadeira, condicionada aos dados observados.
 
-Valores altos de $\pi(x)$ mostram forte evidência empírica a favor de $H_0$, enquanro valores baicos sugerem que $H_0$ é pouco plausível.
+Valores altos de $\pi(x)$ mostram forte evidência empírica a favor de $H_0$, enquanto valores baixos sugerem que $H_0$ é pouco plausível.
 
-Para uma hipótese pontual em parâmetros contínuos, a probabilidade a posteriori é nula:
+Para o caso de testes para hipóteses precisas, a probabilidade posterior será zero. Em termos matemáticos, $P(\theta \in \Theta_0 | x) = 0$, se $dim(\Theta_0) < dim(\Theta)$.
 
-$$
-\int_{\theta_0}^{\theta_0} f(\theta | \mathbf{x}) d\theta = 0
-$$
+### 2.4 e-value (Full Bayesian Significance Test - FBST)
 
-#### 2.1.4 e-value (Full Bayesian Significance Test - FBST)
+Ainda sob a abordagem bayesiana, o *e-value* é uma medida de evidência desenvolvido especificamente para testar hipóteses precisas.
 
-Usando a abordagem bayesiana, o FBST (procedimento de Pereira-Stern) é uma medida de evidência para testar uma hipótese precisa.
-
-Definimos a região $T_x$ como 
-
-**(USAR T(X) OU T_x??)**
+A região $T_x$ representa os pontos do espaço paramétrico desfavoráveis à $H_0$, e é definido como
 
 $$
-T_x = \{ \theta \in \Theta : f(\theta | x) > sup_ {\Theta_0} f(\theta | x) \}
+T_x = \left\{ \theta \in \Theta : f(\theta | x) > \sup_ {\Theta_0} f(\theta | x) \right\}
 $$
 
-A partir disso, definimos o *e-value*:
-
-**(USAR Ev(X) OU e(x)??)**
+A partir disso, o *e-value* é definido por
 
 $$
-Ev(x) = 1 - P(\theta \in T_x | x)
+Ev(x) = 1 - P(\theta \in T_x | x).
 $$
 
-**(PERGUNTAR SOBRE O e(x) DO DOCUMENTO)**
-
-Um *e-value* grande indica ausência de evidência contra $H_0$.
+O FBST (Procedimento de Pereira-Stern) consiste em rejeitar $H_0$ para valores "pequenos" de $Ev(x)$.
 
 
-### 2.2. Exemplos de modelos
+## 2.2. Exemplos de modelos
 
-#### 2.2.1 Modelos para Dados Discretos
+### Bernoulli-Beta:
 
-**Bernoulli-Beta:**
+Seja $X_1, \cdots , X_n$ v.a. c.i.i.d tais que $X_i | \theta \sim Bernoulli(\theta)$. 
 
-Analisamos $X_i \sim \text{Ber}(\theta)$ com $\theta \sim \text{Beta}(a, b)$. A posterior é $\text{Beta}(a + \sum x_i, b + n - \sum x_i)$.
- 
-**(Não sei qual interpretação colocar)**
+A estatística suficiente para $\theta$ é a soma dos sucessos, denotada por $T(\mathbf{x}) = \sum_{i=1}^{n} X_i$, que segue uma distribuição Binomial, ou seja,
 
-**Poisson-Gama:**
+$$
+T(\mathbf{x}) = \sum_{i=1}^{n} X_i \big{|} \theta \sim Bin(n, \theta)
+$$
 
-Para $X_i \sim \text{Pois}(\lambda)$ com $\lambda \sim \text{Gama}(\alpha, \beta)$, a posterior é $\text{Gama}(\alpha + \sum x_i, \beta + n)$. 
+Suponha que a priori desse modelo seja uma priori conjugada $\theta \sim \text{Beta}(a, b)$. Por simplicidade, considere que exista razão para acreditar em nenhum valor, fixaremos os parâmetros como $a=1$ e $b=1$, ou seja, uma distribuição Uniforme no intervalo $(0, 1)$.
 
-#### 2.2.2 Modelos para Dados Contínuos
+Considere que:
 
-**Exponencial-Gama:**
-Teste sobre o tempo de vida médio. Não esquecer de citar que as métricas apresentaram alta concordância visual e correlação próxima à linha $x=y$. 
+$$
+H_0: \theta \leq 0.5 \, \text{ contra } \,  H_1: \theta > 0.5
+$$
 
-**Uniforme-Pareto:**
-É legal citar que a estatística suficiente nesse caso é o máximo (diferente dos outros exemplos). Falar também da queda da evidência quando o máximo observado $x$ ultrapassa o valor da hipótese nula $\theta_0$.
+Desse modo, o espaço paramétrico é $\Theta = [0, 1]$ e o subespaço de $H_0$ é $\Theta_0 = [0, 0.5]$.
 
----
+É valido analisar o comportamento das estatísticas de teste para cada valor possível da estatística suficiente: $x = \sum_{i=1}^n x_i \in \{0, 1, \cdots, n \}$.
 
-## 3. Análise Comparativa e Resultados
+Nesse exemplo a **RVG** é dada por: 
 
-Resumir o que os gráficos de dispersão (e-value vs p-valor) mostram: Nos modelos Bernoulli, Poisson e Exponencial, houve forte correlação entre as medidas, já no modelo Uniforme, o e-valor tendeu a ser mais conservador (menor) que o p-valor.
+$$
+\lambda(x) = \frac{V_x(0.5 | x)}{V_x(x/n | x)} = 
+\frac{0.5^x (1-0.5)^{n-x}}{(x/n)^x (1 - x/n)^{n-x}}
+, \text{se } x > n/2.
+$$
+
+Se a estimativa pertence à [0, 0.5], que acontece em $x \in \{ 0, \cdots, n/2 \}$, ou seja, se $\hat{\theta}_{MV} \le 0.5$, o numerador e o denominador são iguais, logo $\lambda(x) = 1$.
+
+Já para o cálculo do **p-value** buscamos o supremo da probabilidade na região de rejeição sob o espaço da hipótese nula $\Theta_0 = [0, 0.5]$. Assim, calculamos a probabilidade de uma variável $X \sim \text{Binomial}(n, 0.5)$ ser maior ou igual ao valor observado $x$. Como a probabilidade de obter sucessos aumenta com $\theta$, o valor máximo ocorre em $\theta = 0.5$. 
+
+$$
+\text{p-value} = P(X \ge x \mid \theta = 0.5) =
+\begin{cases} 
+\sum_{k=x}^{n} \binom{n}{k} (0.5)^k (1-0.5)^{n-k} & \text{se } x > n/2 \\
+1 & \text{se } x \le n/2
+\end{cases}
+$$
+
+
+
+Note que o máximo a posteriori (ou a moda da Beta) é $\frac{x}{n}$. No caso que $x \le n/2$, $T_x = \varnothing \left( = \left\{ \theta : f(\theta | x) \geq f\left(\frac{x}{n} | x\right) \right\} \right)$.
+
+```{r grafico1, echo=FALSE, warning=FALSE}
+x <- seq(0, 1, length.out = 1000)
+y1 <- dbeta(x, shape1 = 3, shape2 = 7) 
+y2 <- dbeta(x, shape1 = 7, shape2 = 3)
+
+plot(x, y1, type = "l", lwd = 2, xlab = expression(theta), ylab = expression(f(theta * "|" * x)), 
+     main = "Gráfico 1: Sup em H0", axes = FALSE)
+axis(1, at = c(0, 0.5, 1), labels = c("0", "1/2", "1"))
+axis(2)
+
+theta_hat <- x[which.max(y1)]
+lines(c(theta_hat, theta_hat), c(0, max(y1)), lty = 2)
+text(theta_hat, -0.2, expression(theta[0]), xpd = TRUE)
+
+abline(v = 0.5, lty = 2, col = "gray")
+
+lines(c(0, 0.5), c(0, 0), lwd = 6, col = "brown")
+```
+
+Por outro lado, se $x > n/2$, $\sup_ {\Theta_0} f(\theta | x) = f(0.5 | x)$, de modo que $T_x \neq \varnothing$ e *e-value* < 1. A obtenção da região $T_x$ e o cálculo do *e-value* serão realizadas computacionalmente pois o cálculo analítico não possui forma fechada.
+
+```{r grafico2, echo=FALSE, warning=FALSE}
+plot(x, y2, type = "l", lwd = 2, xlab = expression(theta), ylab = expression(f(theta * "|" * x)), 
+     main = "Gráfico 2: Sup na fronteira", axes = FALSE)
+axis(1, at = c(0, 0.5, 1), labels = c("0", "1/2", "1"))
+axis(2)
+
+tx_val <- dbeta(0.5, 7, 3)
+points(0.5, tx_val, pch = 19, col = "brown")
+lines(c(0.5, 0.5), c(0, tx_val), lty = 2)
+
+segments(0.5, tx_val, 0.82, tx_val, lty = 2) 
+lines(c(0.82, 0.82), c(0, tx_val), lty = 2)
+
+lines(c(0, 0.5), c(0, 0), lwd = 6, col = "brown")
+text(0.25, -0.2, expression(theta[0]), xpd = TRUE)
+```
+
+A distribuição posterior é Beta: $\theta | x \sim Beta(a+x, b+n-x)$. Queremos calcular $P(\theta \in \Theta_0 | x)$, ou seja, área sob a curva da f.d.p. posterior que pertence à hipótese nula ($\theta \le 0.5$).
+
+$$ 
+\pi(x) = P(\theta \le 0.5 | x) = \int_{0}^{0.5} f(\theta | 1+x, 1+n-x)  d\theta 
+$$
+
+
+
+Suponha que foi observado $n=10$, $x = \sum_{i=1}^{10} x_i$ e, a priori $a=b=1$. Então, a distribuição a posteriori é $Beta(1+x, 11-x)$.
+
+Os gráficos a seguir mostram as medidas de evidência a favor da hipótese nula ($H_0: \theta \le 0.5$) diminuem à medida que o número de sucessos ($x$) aumenta.
+
+```{r dados_ber, echo=FALSE, warning=FALSE}
+library(ggplot2)
+library(patchwork) 
+
+n <- 10
+x_seq <- 0:10
+a <- 1 
+b <- 1
+
+resultados <- data.frame(
+  x = x_seq,
+  RVG = NA,
+  p_valor = NA,
+  Posteriori = NA,
+  e_valor = NA)
+
+for (i in 1:length(x_seq)) {
+  x <- x_seq[i]
+  
+  # RVG 
+  theta_hat <- x / n
+  log_L_global <- dbinom(x, size = n, prob = theta_hat, log = TRUE)
+  
+  if (theta_hat <= 0.5) {
+    resultados$RVG[i] <- 1} 
+  else {
+    log_L_restrito <- dbinom(x, size = n, prob = 0.5, log = TRUE)
+    resultados$RVG[i] <- exp(log_L_restrito - log_L_global)}
+  
+  # p-valor 
+  resultados$p_valor[i] <- pbinom(x - 1, size = n, prob = 0.5, lower.tail = FALSE)
+  
+  # Posteriori 
+  a_post <- a + x
+  b_post <- b + n - x
+
+  resultados$Posteriori[i] <- pbeta(0.5, shape1 = a_post, shape2 = b_post)
+  
+  # e-valor 
+  moda_post <- (a_post - 1) / (a_post + b_post - 2)
+  
+  if(x == 0) moda_post <- 0
+  if(x == 10) moda_post <- 1
+  
+  if (moda_post <= 0.5) {
+    resultados$e_valor[i] <- 1} 
+  else {
+    densidade_corte <- dbeta(0.5, a_post, b_post)
+    
+    if (x == n) {
+      prob_tangente <- pbeta(1, a_post, b_post) - pbeta(0.5, a_post, b_post)} 
+    else {
+      funcao_busca <- function(t) dbeta(t, a_post, b_post) - densidade_corte
+      raiz <- uniroot(funcao_busca, interval = c(moda_post, 1))$root
+      prob_tangente <- pbeta(raiz, a_post, b_post) - pbeta(0.5, a_post, b_post)}
+    
+    resultados$e_valor[i] <- 1 - prob_tangente}}
+
+tema <- theme_bw() + theme(panel.grid.minor = element_blank())
+```
+
+
+```{r graf_ber, echo=FALSE, warning=FALSE}
+# Gráfico 1: RVG
+g1 <- ggplot(resultados, aes(x=x, y=RVG)) + 
+  geom_line(color="blue", size=1) + geom_point() +
+  scale_x_continuous(breaks=0:10) +
+  labs(title="RVG", y=expression(lambda(x))) + tema
+
+# Gráfico 2: p-valor
+g2 <- ggplot(resultados, aes(x=x, y=p_valor)) + 
+  geom_line(color="deeppink", size=1) + geom_point() +
+  geom_hline(yintercept=0.05, linetype="dashed", color="gray") +
+  scale_x_continuous(breaks=0:10) +
+  labs(title="p-valor", y="p-valor") + tema
+
+# Gráfico 3: Posteriori
+g3 <- ggplot(resultados, aes(x=x, y=Posteriori)) + 
+  geom_line(color="green4", size=1) + geom_point() +
+  scale_x_continuous(breaks=0:10) +
+  labs(title="Posteriori", y="P(H0|x)") + tema
+
+# Gráfico 4: e-valor
+g4 <- ggplot(resultados, aes(x=x, y=e_valor)) + 
+  geom_line(color="purple", size=1) + geom_point() +
+  scale_x_continuous(breaks=0:10) +
+  labs(title="e-valor", y="ev(H0|x)") + tema
+
+(g1 + g2) / (g3 + g4)
+```
+
+
+### Exponencial-Gama:
+
+Seja $X_1, \dots, X_n$ v.a. c.i.i.d. tal que $X_i|\theta \sim \text{Exp}(\theta)$. A função densidade é dada por $f(x | \theta) = \theta e^{-\theta x}$. 
+
+Nesse caso, a estatística suficiente é a soma dos tempos observados: $T(\mathbf{x}) = \sum_{i=1}^{n} x_i$. Temos que soma de $n$ Exponenciais ($\theta$) segue uma distribuição Gama:
+
+$$
+T(\mathbf{x}) \sim Gama (n, \lambda)
+$$
+
+Suponha que 
+
+$$
+H_0: \theta = 1.5 \quad \text{contra} \quad H_1: \theta \neq 1.5
+$$
+
+O valor esperado da nossa estatística suficiente será $E[T] = n / \theta = n / 1.5$.
+
+
+A **RVG** é dada por:
+
+$$
+\lambda(x) = \frac{V_x(1.5 | x)}{V_x(x/n | x)} = 
+\frac{1.5^n e^{-1.5 T}}{(\frac{n}{T})^n e^{-\frac{n}{T} T}} =
+\frac{ 1.5 ^n e^{-1.5 T}}{(\frac{n}{T})^n e^{-n}}
+$$
+
+Observa-se que para a estatística suficiente próxima de $E[T]$ o *p-value* será muito alto, já que a soma observada é a mesma da hipótese nula. Já para valores baixos ou altos o p-value cairá.
+
+A distribuição posterior é Gama: $\theta | \mathbf{x} \sim \text{Gama}(\alpha_{post} = 12, \, \beta_{post} = 1 + x)$. Como o teste é preciso a posteriori será zero: $P(\theta \in \Theta_0 | x) = 0$.
+
+Admita que a priori para o $\theta$ seja Gama, com parâmetros $alpha=2$ e $\beta =1$. Suponha também que foi observado uma amostra de tamanho $n=10$. Nesse caso, $E[T] = n / \theta = 10 / 1.5 \approx 6.667$
+
+Será analisado o comportamento das estatísticas de teste para uma sequência de valores $\mathbf{x}$ (soma), em torno da média esperada (variando de 2 a 18), $x = \sum_{i=1}^{10} x_i \in \{2, \cdots, 18 \}$.
+
+Nos gráficos a seguir, é possível observar que o RVG, o *p-value* e o *e-value* são parecidos, neles o pico ocorre exatamente em $x \approx 6.667$, onde os dados são mais compatíveis com a hipótese nula.
+
+
+```{r dados_exp, echo=FALSE, warning=FALSE}
+library(ggplot2)
+library(patchwork)
+
+n <- 10
+lambda_0 <- 1.5          
+val_esperado <- n / lambda_0 
+x_seq <- seq(from = 2, to = 18, by = 0.5)
+alpha_prior <- 2
+beta_prior <- 1
+
+resultados <- data.frame(
+  x = x_seq,
+  RVG = NA,
+  p_valor = NA,
+  Posteriori = NA,
+  e_valor = NA)
+
+for (i in 1:length(x_seq)) {
+  x_loop <- x_seq[i] 
+  
+  # RVG 
+  theta_hat <- n / x_loop 
+  log_L <- function(lam, sum_x, n) {
+    n * log(lam) - lam * sum_x}
+  
+  log_L_H0 <- log_L(lambda_0, x_loop, n)
+  log_L_Global <- log_L(theta_hat, x_loop, n)
+  
+  resultados$RVG[i] <- exp(log_L_H0 - log_L_Global)
+  
+  # p-valor 
+  prob_acumulada <- pgamma(x_loop, shape = n, rate = lambda_0)
+  resultados$p_valor[i] <- 2 * min(prob_acumulada, 1 - prob_acumulada)
+  
+  # Posteriori
+  resultados$Posteriori[i] <- 0
+  
+  # e-valor 
+  alpha_post <- alpha_prior + n
+  beta_post <- beta_prior + x_loop
+  densidade_corte <- dgamma(lambda_0, shape = alpha_post, rate = beta_post)
+  moda_post <- (alpha_post - 1) / beta_post
+  
+  f_busca <- function(t) dgamma(t, alpha_post, rate = beta_post) - densidade_corte
+
+  if (abs(moda_post - lambda_0) < 0.01) {
+    resultados$e_valor[i] <- 1} 
+  else {
+    raiz_esq <- try(uniroot(f_busca, interval = c(0.0001, moda_post))$root, silent=TRUE)
+    raiz_dir <- try(uniroot(f_busca, interval = c(moda_post, moda_post + 20))$root, silent=TRUE)
+    
+    if(!inherits(raiz_esq, "try-error") & !inherits(raiz_dir, "try-error")) {
+      prob_tangente <- pgamma(raiz_dir, shape=alpha_post, rate=beta_post) - 
+                       pgamma(raiz_esq, shape=alpha_post, rate=beta_post)
+      resultados$e_valor[i] <- 1 - prob_tangente} 
+    else {
+      resultados$e_valor[i] <- 0}}}
+```
+
+
+```{r graf_exp, echo=FALSE, warning=FALSE}
+tema <- theme_bw() + theme(panel.grid.minor = element_blank())
+
+# Gráfico 1: RVG
+g1 <- ggplot(resultados, aes(x=x, y=RVG)) + 
+  geom_line(color="blue", size=1) + geom_point(size=1) +
+  labs(title="RVG", subtitle="Pico esperado em x ~ 6.67", y=expression(lambda(x))) + tema
+
+# Gráfico 2: p-valor
+g2 <- ggplot(resultados, aes(x=x, y=p_valor)) + 
+  geom_line(color="deeppink", size=1) + geom_point(size=1) +
+  geom_hline(yintercept=0.05, linetype="dashed", color="gray") +
+  labs(title="p-valor (Bilateral)", y="p-valor") + tema
+
+# Gráfico 3: Posteriori
+g3 <- ggplot(resultados, aes(x=x, y=Posteriori)) + 
+  geom_line(color="green4", size=1) + geom_point(size=1) +
+  labs(title="Posteriori (H0 Pontual)", y="P(H0|x)") + tema
+
+# Gráfico 4: e-valor
+g4 <- ggplot(resultados, aes(x=x, y=e_valor)) + 
+  geom_line(color="purple", size=1) + geom_point(size=1) +
+  labs(title="e-valor (FBST)", y="ev(H0|x)") + tema
+
+(g1 + g2) / (g3 + g4)
+```
+
+
+### Uniforme-Pareto:
+
+Seja $X_1, \dots, X_n$ v.a. c.i.i.d. tal que $X_i|\theta \sim \text{Uniforme}(0, \theta)$. A função de densidade é $f(x|\theta) = 1/\theta$ para $0 \le x \le \theta$. 
+
+Para esse caso, a estatística suficiente para $\theta$ é o máximo valor observado:
+
+$$
+T(\mathbf{x}) = \max(X_1, \dots, X_n)
+$$
+
+Sendo assim, o parâmetro $\theta$ deve ser necessariamente maior ou igual ao maior valor observado ($\theta \ge T(\mathbf{x})$). 
+
+Suponha que a priori para o limite da Uniforme tenha uma distribuição Pareto: $\theta \sim \text{Pareto}(\alpha, x_m)$. Sua função de densidade de probabilidade é:
+
+$$
+f(\theta) = \frac{\alpha x_m^\alpha}{\theta^{\alpha+1}}
+$$
+
+Suponha que
+
+$$
+H_0: \theta = 15 \quad \text{contra} \quad H_1: \theta \neq 15
+$$
+Diferente das distribuições anteriores, a verossimilhança da Uniforme decai para zero abruptamente. Se o máximo observado for maior que 15 ($x > 15$), a hipótese nula é impossível. Neste caso, RVG, p-value e e-value devem ser zero.  
+
+Para $x \le 15$, a **RVG** é dada por
+
+$$
+\lambda(x) = \frac{V_x(15)}{V_x(x)} = \frac{1/15^n}{1/x^n} = \left( \frac{x}{15} \right)^n
+$$
+
+
+Com isso, 
+
+$$
+\lambda(x) = \begin{cases} 
+\left( \frac{x}{15} \right)^n & \text{se } x \le 15 \\
+0 & \text{se } x > 15 
+\end{cases}
+$$
+
+Para o cálculo do *p-value*, se o $x_{max} \le 15$ a probabilidade de que os $n$ elementos da amostra sejam menores ou iguais a um valor $x$ é:
+
+$$
+P(X_{max} \le x) = \left( \frac{x}{15} \right)^n
+$$
+
+Para algum valor na amostra maior que 15, a probabilidade disso acontecer sob a hipótese nula ($\theta=15$) é zero. Logo, o p-value é 0.
+
+Já a distribuição posterior tem distribuição Pareto, com parâmetros: $\alpha_{post} = \alpha + n = 3 + n = 11$ e $x_{m, post} = \max(x_m, T(\mathbf{x})) = \max(10, \max(X_i))$. Mas como o teste é preciso a posteriori será zero: $P(\theta \in \Theta_0 | x) = 0$.
+
+Admita que $n=8$ e que a priori para o limite da Uniforme tenha uma distribuição Pareto, com parâmetros: $\theta \sim \text{Pareto}(\alpha=3, x_m=10)$
+
+Será analisado o comportamento das estatísticas de teste para uma sequência de valores $x$ (máximo), variando de 10 (mínimo da priori) a 16, $x \in \{10, \cdots, 16 \}$.
+
+Os gráficos a seguir mostram que O RVG, o p-value e o e-value possuem uma forma parecida, a medida aumenta conforme o dado observado ($x$) se aproxima de 15, atingindo o máximo em $x=15$. Assim que $x > 15$, ela cai para 0.
+
+
+```{r dados_unif, echo = FALSE, warning = FALSE}
+library(ggplot2)
+library(patchwork)
+
+n <- 8
+theta_0 <- 15        
+xm_prior <- 10        
+alpha_prior <- 3      
+x_seq <- seq(from = 10, to = 16, by = 0.2)
+
+
+resultados <- data.frame(
+  x = x_seq,
+  RVG = NA,
+  p_valor = NA,
+  Posteriori = NA,
+  e_valor = NA)
+
+for (i in 1:length(x_seq)) {
+  x_loop <- x_seq[i]
+  
+  # RVG 
+  lik_global <- (x_loop)^(-n)
+
+  if (x_loop > theta_0) {
+    resultados$RVG[i] <- 0} 
+  else {
+    lik_H0 <- (theta_0)^(-n)
+    resultados$RVG[i] <- lik_H0 / lik_global}
+  
+  # p-valor
+  
+  if (x_loop > theta_0) {
+    resultados$p_valor[i] <- 0} 
+  else {
+    prob_acumulada <- (x_loop / theta_0)^n
+    resultados$p_valor[i] <- 2 * min(prob_acumulada, 1 - prob_acumulada)}
+  
+  # Posteriori
+  resultados$Posteriori[i] <- 0
+  
+  # e-valor 
+  alpha_post <- alpha_prior + n   
+  xm_post <- max(xm_prior, x_loop) 
+  
+  if (x_loop > theta_0) {
+    resultados$e_valor[i] <- 0} 
+  else {
+    prob_cauda_15 <- (xm_post / theta_0)^alpha_post
+    resultados$e_valor[i] <- prob_cauda_15}}
+```
+
+
+```{r graf_unif, echo = FALSE, warning = FALSE}
+tema <- theme_bw() + theme(panel.grid.minor = element_blank())
+
+# Gráfico 1: RVG
+g1 <- ggplot(resultados, aes(x=x, y=RVG)) + 
+  geom_line(color="blue", size=1) + geom_point(size=1) +
+  labs(title="RVG", y=expression(lambda(x))) + tema
+
+# Gráfico 2: p-valor
+g2 <- ggplot(resultados, aes(x=x, y=p_valor)) + 
+  geom_line(color="deeppink", size=1) + geom_point(size=1) +
+  geom_hline(yintercept=0.05, linetype="dashed", color="gray") +
+  labs(title="p-valor", y="p-valor") + tema
+
+# Gráfico 3: Posteriori
+g3 <- ggplot(resultados, aes(x=x, y=Posteriori)) + 
+  geom_line(color="green4", size=1) + geom_point(size=1) +
+  labs(title="Posteriori (H0 Pontual)", y="P(H0|x)") + tema
+
+# Gráfico 4: e-valor
+g4 <- ggplot(resultados, aes(x=x, y=e_valor)) + 
+  geom_line(color="purple", size=1) + geom_point(size=1) +
+  labs(title="e-valor (FBST)", y="ev(H0|x)") + tema
+
+(g1 + g2) / (g3 + g4)
+```
 
 ---
 
 ## 4. Conclusão e Próximos Passos
 
-Para a parte da conclusão dizer que a (RVG), o p-valor e o e-valor atingem seu pico de evidência (valor 1) simultaneamente quando os dados observados coincidem com o valor esperado sob a hipótese nula $H_0$.
+A análise comparativa realizada nesse projeto permitiu observar o comportamento de diferentes estatísticas de teste sob uma variedade de modelos probabilísticos. Os resultados mostram que a Razão de Verossimilhança Generalizada, o *p-value* e o *e-value* atingem seu máximo quando os dados observados coincidem com o valor esperado sob $H_0$.
 
-E que os gráficos de dispersão mostram uma correlação positiva clara, indicando que quando o p-valor é pequeno (rejeição estatística), o e-valor também o é.
+A continuidade do projeto focará na transição da análise teórica para a aplicação prática das metodologias em dados reais provenientes do Centro de Estatística Aplicada (IME-USP) para a comparação de decisões inferenciais com base em diferentes métricas de evidência.
 
-Já para os próximos passos são aplicar os testes em um banco de dados reais vindos do CEA. 
+Além disso, buscaremos analisar formalmente os valores de corte para as estatísticas de teste e desenvolver critérios de corte equivalentes para o e-value, buscando estabelecer zonas de rejeição e aceitação que mantenham a coerência com as propriedades do FBST.
 
-Sugestão de próximos passos: Expandir para modelos de dois parâmetros (ex: Normal com média e variância desconhecidas).
+Desse modo, espera-se consolidar a interpretação das estatísticas de teste, fornecendo ferramentas interpretativas que contribuam na tomada de decisão em problemas de teste de hipótese.
 
 ---
 
 ## Bibliografia 
 
+[1]  Fossaluza, V., Izbicki, R., da Silva, G. M. and Esteves, L. G. Coherent hypothesis testing. The American Statistician, 71(3), pp.242-248, 2017.
 
+[2] Pereira, C. A. de B., Stern, J. M., & Wechsler, S. Can a significance test be genuinely Bayesian? Bayesian Analysis, 3(1), 79–100, 2008.
+
+[3] Pereira, C. A. B., Stern, J. M. Evidence and credibility: Full bayesian significance test for precise hypotheses. Entropy, I(4):99-110, 1999.
+
+[4] Stern, J. M. Bayesian evidence test for precise hypotheses. Journal of Statistical Planning and Inference, 117(2), 185–198, 2003.
+
+[5]  Schervish, M. J. P-values: what they are and What they are not. The American Statistician, 50, 203–206, 1996.
+
+[6] Madruga, M. R. Teste de significância: uma proposta genuinamente bayesiana. Tese (Doutorado), Instituto de Matemática e Estatística, Universidade de São Paulo (USP), 2002
