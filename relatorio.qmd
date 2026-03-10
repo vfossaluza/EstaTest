@@ -148,10 +148,14 @@ $$
 
 Note que o máximo a posteriori (ou a moda da Beta) é $\frac{x}{n}$. No caso que $x \le n/2$, $T_x = \varnothing \left( = \left\{ \theta : f(\theta | x) \geq f\left(\frac{x}{n} | x\right) \right\} \right)$.
 
-```{r grafico1, echo=FALSE, warning=FALSE}
+Por outro lado, se $x > n/2$, $\sup_ {\Theta_0} f(\theta | x) = f(0.5 | x)$, de modo que $T_x \neq \varnothing$ e *e-value* < 1. A obtenção da região $T_x$ e o cálculo do *e-value* serão realizadas computacionalmente pois o cálculo analítico não possui forma fechada.
+
+```{r graficos_ev, echo=FALSE, warning=FALSE}
 x <- seq(0, 1, length.out = 1000)
 y1 <- dbeta(x, shape1 = 3, shape2 = 7) 
 y2 <- dbeta(x, shape1 = 7, shape2 = 3)
+
+par(mfrow = c(1,2))  # dois gráficos lado a lado
 
 plot(x, y1, type = "l", lwd = 2, xlab = expression(theta), ylab = expression(f(theta * "|" * x)), 
      main = "Gráfico 1: Sup em H0", axes = FALSE)
@@ -165,11 +169,7 @@ text(theta_hat, -0.2, expression(theta[0]), xpd = TRUE)
 abline(v = 0.5, lty = 2, col = "gray")
 
 lines(c(0, 0.5), c(0, 0), lwd = 6, col = "brown")
-```
 
-Por outro lado, se $x > n/2$, $\sup_ {\Theta_0} f(\theta | x) = f(0.5 | x)$, de modo que $T_x \neq \varnothing$ e *e-value* < 1. A obtenção da região $T_x$ e o cálculo do *e-value* serão realizadas computacionalmente pois o cálculo analítico não possui forma fechada.
-
-```{r grafico2, echo=FALSE, warning=FALSE}
 plot(x, y2, type = "l", lwd = 2, xlab = expression(theta), ylab = expression(f(theta * "|" * x)), 
      main = "Gráfico 2: Sup na fronteira", axes = FALSE)
 axis(1, at = c(0, 0.5, 1), labels = c("0", "1/2", "1"))
