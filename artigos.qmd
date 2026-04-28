@@ -1,0 +1,58 @@
+---
+title: "Artigos"
+format: html
+---
+
+Na abordagem frequentista, costumamos fixar o erro do Tipo I $\alpha$ (rejeitar $H_0$ quando $H_0$ é verdadeira) e minimizamos o erro do Tipo II $\beta$ (não rejeitar $H_0$ quando $H_0$ é falsa).
+
+Já a versão citada no artigo é a do DeGroot, que busca minimizar uma função de perda baseada na combinação linear dos dois erros:
+
+$$
+a\alpha + b\beta
+$$
+  
+Nesse caso, $a$ e $b$ é nossa preferência a priori pelas hipóteses. 
+
+A solução que minimiza essa função é um teste que rejeita $H_0$ quando o Fator de Bayes for menor que $\frac{a}{b}$. Com isso, não fixamos nenhum erro, ou seja, não fixamos $\alpha = 0,05$ e ambos os erros variam conforme o tamanho da amostra $n$ cresce.
+
+## O P-valor
+
+O P-valor é a probabilidade, sob $H_0$, do evento composto por todos os pontos amostrais que favorecem $A$ pelo menos tanto quanto x0.
+
+Vamos definir:
+
+- $f_H(x)$: densidade preditiva sob a hipótese $H$.
+
+- $f_A(x)$: densidade preditiva sob a hipótese $A$
+
+*Estudar sobre densidade preditiva!!*
+
+Nosso fator de bayes é:
+
+$$
+BF_{HA}(x) = \frac{f_H(x)}{f_A(x)}
+$$
+
+Agora, definimos uma região $\Psi$ como o conjunto de pontos onde o fator de bayes é menor ou igual ao observado:
+
+$$
+\Psi = \{x \in \mathfrak{X} : BF_{HA}(x) \le BF_{HA}(x_0)\}
+$$
+
+Desse modo, o P-value é a integral/soma da densidade de $H$ nessa região
+
+$$
+
+P =
+\begin{cases}
+\int_{\Psi} f_H(x) dx, & \text{se } \Psi \text{ for contínuo} \\
+\sum_{\Psi} f_H(x), & \text{se } \Psi \text{ for discreto}
+\end{cases}
+
+$$
+
+---
+
+## Artigo 2 
+
+
