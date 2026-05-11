@@ -1,0 +1,151 @@
+---
+title: "Reunião 29.04"
+format: pdf
+---
+
+Podemos reescrever:
+
+$$
+f(\mathbf{x}, \theta) = f(\mathbf{x} | \theta) f(\theta) = 
+f(\theta | \mathbf{x}) f(\mathbf{x})
+$$
+
+Podemos com isso, definir a **preditiva a priori**:
+
+$$
+f(\mathbf{x}) = \int_{\Theta} f(\mathbf{x}, \theta) d \theta
+= \int_{\Theta} f(\mathbf{x} | \theta) f(\theta) d \theta
+$$
+
+
+Temos também a **preditiva a posteriori**:
+
+$$
+f(x_{n+1} | x_1, \cdots, x_n) = \frac{f(x_1, \cdots, x_n,  x_{n+1})}{f(x_1, \cdots, x_n)}
+= \int_{\Theta} f(x_{n+1} | \theta) f(\theta | \mathbf{x}) \\ =
+\int_{\Theta} f(x_{n+1} | \theta) \frac{f(\mathbf{x} | \theta)
+f(\theta)}{f(\mathbf{x})} d \theta
+$$
+
+---
+
+Para facilitar a notação, vamos usar $H$ contra $A$, ao invés de $H_0$ e $H_1$, como usado anteriormente.
+
+Vamos definir
+
+$$
+H : \theta \in \Theta_H 
+$$
+
+$$
+A : \theta \in \Theta_H^c
+$$
+
+Podemos calcular as funções $f_H(x)$ e $f_A(x)$ preditivas a priori sob cada hipótese.
+
+Sob $H$, $f_H(x)$ é a densidade dos dados assumindo que a hipótese nula é verdadeira:
+
+$$
+f_H(x) = \int_{\Theta_H} f(x|\theta) f_H(\theta) d\theta
+$$
+
+Onde:
+
+- $f(x|\theta)$ é a função de verossimilhança
+
+- $f_H(\theta)$ é a densidade a priori de $H$ (ou seja, como você acredita que o parâmetro se distribui dentro do espaço nulo)
+
+Já sob $A$, $f_A(x)$ é a densidade dos dados assumindo a hipótese alternativa é verdade:
+
+$$
+f_A(x) = \int_{\Theta_A} f(x|\theta) f_A(\theta) d\theta
+$$
+
+Onde:
+
+- $f_A(\theta)$ é a densidade a priori de $A$ (como o parâmetro se distribui se a alternativa for verdadeira).
+
+Para o caso de hipóteses precisas $f_H(x) = f(x|\theta_0)$.
+
+- **Exemplo de $f_A$ e $f_H$ para hipóteses precisas**
+
+Seja $\theta \sim Beta(a, b)$
+
+Queremos testar:
+
+$$
+H : \theta = 1/2
+$$
+
+$$
+A : \theta \neq 1/2
+$$
+
+Nesse caso,
+
+$$
+f_H(\theta) = f(\theta) \mathbb{1}(\theta \neq 1/2)
+$$
+
+E,
+
+$$
+f_A(\theta) = f(1/2) \mathbb{1}(\theta = 1/2)
+$$
+
+
+---
+
+## Fator de bayes
+
+A partir de $f_H(x)$ e $f_A(x)$
+
+$$
+BF(x) = \frac{f_H(x)}{f_A(x)} = \frac{\int_{\theta \in H} f(x | \theta) 
+f_H(\theta) d \theta}{\int_{\theta \in A} f(x | \theta) 
+f_A(\theta) d \theta}
+$$
+
+---
+
+## P-value
+
+Vamos definir o P-value como 
+
+$$
+\text{P-value} = P( \{ X: BF(\textbf{X}) \leq BF( \textbf{X}_{obs}) \} | H )
+$$
+
+Vamos chamar de $R = \{ X: BF(\textbf{X}) \leq BF( \textbf{X}_{obs}) \}$, ou seja
+
+$$
+\text{P-value} = \int_R f_H(\textbf{x}) dx
+$$
+
+Definiremos também outras duas regiões:
+
+- $RC = \{ \textbf{X} : BF(\textbf{X}) \leq \frac{a}{b} \}$
+
+- $C= \{ \textbf{X} : BF(\textbf{X}) > \frac{a}{b} \}$
+
+A partir disso, calculamos $\alpha$ e $\beta$:
+
+$$
+\alpha = P \left( \left\{ \textbf{X} : BF(\textbf{X}) \leq \frac{a}{b} \right\}
+| H \right) = \int_{RC} f_H (\textbf{x}) dx
+$$
+
+E,
+
+$$
+\beta = P \left( \left\{ \textbf{X} : BF(\textbf{X}) > \frac{a}{b} \right\}
+| A \right) = \int_{C} f_A (\textbf{x}) dx
+$$
+
+
+
+
+
+
+
+
