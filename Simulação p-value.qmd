@@ -1,0 +1,81 @@
+---
+title: "Simulação - p-value"
+format: pdf
+---
+
+Seja 
+
+$$
+X_i | \theta \sim Ber(\theta)
+$$
+
+E nossa priori é
+
+$$
+\theta \sim Beta(a, b)
+$$
+Desse modo $Y = \sum X_i$ é estatística suficiente.
+
+Queremos testar,
+
+$$H_0 : \theta = 1/2$$
+
+$$H_1 = \theta \neq 1/2$$
+
+Para isso, simularemos $m$ pares de $( \textbf{X}, \theta)$, ou seja, $( \textbf{X}, \theta)_j$, com $j=1, \cdots, m$ e calcularemos o *p-value*.
+
+---
+
+Sabemos que o *p-value* mede o quão extremo o valor observado de $Y= \sum X_i$ é sob $H_0$.
+
+Perceba que, sob $H_0$, $\theta = 1/2$, ou seja,
+
+$$
+Y | \theta \sim Bin(n, 1/2)
+$$
+
+Então, depois de observar $y_j$, $j=1, \cdots, m$, queremos calcular
+
+$$
+p(y) = \begin{cases}
+P(Y \geq y | \theta = 1/2), &  y > n/2 \\
+P(Y \leq y | \theta = 1/2), & y < n/2 \\
+1, & y = n/2
+\end{cases}
+$$
+
+Faremos $m=1000$ simulações.
+
+```{r}
+# Parâmetros
+
+n <- 20      # tamanho da amostra
+m <- 1000    # número de simulações
+
+p_valor <- function(y, n){
+  if(y > n/2){
+    # P(Y >= y | theta = 1/2)
+    p <- 1 - pbinom(y - 1, size = n, prob = 1/2)
+  } else if(y < n/2){
+    # P(Y <= y | theta = 1/2)
+    p <- pbinom(y, size = n, prob = 1/2)
+  } else {
+    p <- 1
+  }
+  return(p)}
+
+# Simulação sob H0
+
+# y1, ..., ym ~ Bin(n, 1/2)
+y <- rbinom(m, size = n, prob = 1/2)
+
+# Calcula p(y1), ..., p(ym)
+pvals <- sapply(y, p_valor, n = n)
+
+head(y)
+head(pvals)
+```
+
+
+
+
