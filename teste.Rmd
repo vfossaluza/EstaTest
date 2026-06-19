@@ -1,0 +1,86 @@
+---
+title: "Teste"
+author: "Gabriela Scarpini"
+date: "2026-06-18"
+output: html_document
+---
+
+
+```{r}
+# Carregando pacotes necessários
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# 1. Função do p-valor corrigida
+p_valor <- function(y, n) {
+  if (y > n/2) {
+    p <- 2 * (1 - pbinom(y - 1, size = n, prob = 1/2))
+  } else if (y < n/2) {
+    p <- 2 * pbinom(y, size = n, prob = 1/2)
+  } else {
+    p <- 1
+  }
+  p <- min(p, 1) # garantir p <= 1
+  return(p)
+}
+
+# 2. Função para simular sob H1 (fora de H0) usando a priori Beta(1,1)
+simular_h1 <- function(n_atual, m) {
+  theta <- rbeta(m, 1, 1)                  # Sorteia theta da Beta(1,1)
+  y <- rbinom(m, size = n_atual, prob = theta) # Simula Y dado theta
+  pvals <- sapply(y, p_valor, n = n_atual) # Calcula os p-valores
+  return(pvals)
+}
+
+# 3. Parâmetros da Simulação (Atualizado para m = 10.000)
+n_valores <- c(5, 10, 20, 40, 100, 200, 500) # Tamanhos de amostra
+m <- 10000 # Quantidade de p-valores por n
+
+# 4. Criando a tabela solicitada (n na 1ª coluna, 10.000 p-valores nas demais)
+tabela_p_valores <- data.frame(n = n_valores)
+matriz_p_valores <- matrix(nrow = length(n_valores), ncol = m)
+
+set.seed(123) # Para reprodutibilidade
+for (i in 1:length(n_valores)) {
+  matriz_p_valores[i, ] <- simular_h1(n_valores[i], m)
+}
+
+# Nomeando as colunas de p_val_1 até p_val_10000
+colnames(matriz_p_valores) <- paste0("p_val_", 1:m)
+tabela_p_valores <- cbind(tabela_p_valores, matriz_p_valores)
+
+# 5. Preparando os dados para o gráfico (Transformando para formato 'longo')
+df_long <- tabela_p_valores %>%
+  pivot_longer(cols = starts_with("p_val"), 
+               names_to = "simulacao", 
+               values_to = "p_valor")
+
+# Calculando a média para traçar a linha solicitada
+df_medias <- df_long %>%
+  group_by(n) %>%
+  summarise(p_valor_medio = mean(p_valor))
+
+# Transformando 'n' em fator para o eixo X do boxplot ficar espaçado corretamente
+df_long$n_factor <- factor(df_long$n, levels = n_valores)
+df_medias$n_factor <- factor(df_medias$n, levels = n_valores)
+
+# 6. Gerando o Gráfico
+ggplot(df_long, aes(x = n_factor, y = p_valor)) +
+  # Adiciona os pontos (alpha menor e size menor devido à grande quantidade de dados)
+  geom_jitter(width = 0.2, alpha = 0.05, color = "steelblue", size = 0.5) +
+  # Adiciona o boxplot por cima (transparente para ver os pontos)
+  geom_boxplot(outlier.shape = NA, fill = "white", alpha = 0.7, color = "black") +
+  # Adiciona a linha de média do p-valor
+  geom_line(data = df_medias, aes(x = n_factor, y = p_valor_medio, group = 1), 
+            color = "red", linewidth = 1.2) +
+  # Adiciona os pontos da média
+  geom_point(data = df_medias, aes(x = n_factor, y = p_valor_medio), 
+             color = "red", size = 3) +
+  theme_minimal() +
+  labs(title = "Distribuição dos p-valores sob H1 (Fora de H0)",
+       subtitle = "Boxplots com 10.000 pontos individuais por n e linha da média (em vermelho)",
+       x = "Tamanho da amostra (n)",
+       y = "P-valor Simulado")
+```
+

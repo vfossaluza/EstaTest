@@ -12,7 +12,7 @@ $$
 E nossa priori é
 
 $$
-\theta \sim Beta(a, b)
+\theta \sim Beta(a=1, b=1)
 $$
 Desse modo $Y = \sum X_i$ é estatística suficiente.
 
@@ -50,15 +50,15 @@ Faremos $m=1000$ simulações.
 # Parâmetros
 
 n <- 20      # tamanho da amostra
-m <- 1000    # número de simulações
+m <- 10000    # número de simulações
 
 p_valor <- function(y, n){
   if(y > n/2){
     # P(Y >= y | theta = 1/2)
-    p <- 1 - pbinom(y - 1, size = n, prob = 1/2)
+    p <- 2*(1 - pbinom(y - 1, size = n, prob = 1/2))
   } else if(y < n/2){
     # P(Y <= y | theta = 1/2)
-    p <- pbinom(y, size = n, prob = 1/2)
+    p <- 2*(pbinom(y, size = n, prob = 1/2))
   } else {
     p <- 1
   }
@@ -74,8 +74,42 @@ pvals <- sapply(y, p_valor, n = n)
 
 head(y)
 head(pvals)
+hist(pvals)
 ```
 
+---
 
+## $\alpha$: erro tipo I
+
+O erro do tipo I acontece quando rejeitamos a hipótese nula, quando $H_0$ é verdadeira. Ou seja, $\alpha = P(\text{rejeitar } H_0 | \theta_0)$
+
+```{r}
+alpha <- mean(I(pvals<=0.05))
+```
+
+---
+
+## $\beta$: erro tipo II
+
+O erro do tipo II acontece quando não rejeitamos a hipótese nula, quando $H_0$ é falsa.
+
+Para calcular o nosso erro do tipo II, precisamos simular o nosso $\theta \in \Theta_A$ e a partir disso calcular o nosso $\beta$:
+
+```{r}
+# Fora de H0
+a=b=1
+theta <- rbeta(m, a, b) # simular m vezes priori beta
+
+# Simular Y | theta
+y1 <- rbinom(m, n, theta)
+
+# excluir theta==0.5
+y1 <- y1[theta!=0.5]
+theta1 <- theta[theta!=0.5]
+m1 <- length(y1)
+pvals1 <- sapply(y1, p_valor, n = n)
+
+beta <- mean(I(pvals1>0.05))
+```
 
 
