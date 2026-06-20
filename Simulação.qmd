@@ -199,3 +199,133 @@ ggplot(df_long, aes(x = n_factor, y = p_valor)) +
 
 
 Nesse gráfico, conseguimos enxergar a concentração de p-values e nos outliers. Como esperado o teste rejeita a hipótese nula com mais frequência conforme o $n$ cresce. 
+
+---
+
+## Probabilidade a Posteriori
+
+Foi simulado o *p-value* para diferentes valores de $n$, mas para a Probabilidade a Posteriori isso seria mais dificil, uma vez que nossa hipótese é precisa ($H_0 = 1/2$) e a priori é contínua ($\theta \sim Beta(a=1, b=1)$), sendo assim, a probabilidade de $\theta | Y = y = \sum x_i$ assumir qualquer valor é 0.
+
+Uma das formas de calcular uma Probabilidade a Posteriori é usando a Priori de Jeffreys, que atribui uma probabilidade positiva para $\theta_0$.
+
+```{r, echo=FALSE, warning=FALSE}
+a=2; b=3
+theta=c(seq(0,0.499,0.001),seq(0.501,1,0.001))
+p=0.5
+pprior = function(t){
+  p*I(t>=0.5)+(1-p)*pbeta(t,a,b)*I(t!=0.5)
+}
+tibble(theta,Jeffreys_Prior=pprior(theta)) %>%
+  ggplot()+
+  geom_line(aes(x=theta,y=Jeffreys_Prior))+
+  geom_point(aes(x=0.5,y=(1-p)*pbeta(0.5,a,b)))+
+  geom_point(aes(x=0.5,y=(1-p)*pbeta(0.5,a,b)+p)) +
+  theme_bw()
+```
+
+
+Desse modo, é possível calcular $P(\theta = 1/2 | X = x)$:
+
+A distribuição preditiva com relação a priori $f_J$ é
+
+$$
+f_J(x)=\displaystyle p_0f(x|\theta_0)~\mathbb{I}(\theta=\theta_0)+ (1-p_0)\overbrace{\int_0^1f(x|\theta)f_\beta(\theta)~\mathbb{I}(\theta\neq\theta_0)d\theta}^{f(x)}
+$$
+
+$$
+=\displaystyle p_0\binom{n}{x}{\theta}_0^x(1-\theta_0)^{n-x}~\mathbb{I}(\theta=\theta_0) + (1-p_0)\binom{n}{x}\dfrac{\beta(a+x,b+n-x)}{\beta(a,b)}~\mathbb{I}(\theta\neq\theta_0)
+$$
+
+De modo que a distribuição a posteriori é  dada de forma geral por:
+
+$$
+p_x = \frac{1}{1 + \frac{1 - p_0}{p_0} \frac{B(a+x, b+n-x)}{(1/2)^n B(a,b)}}
+$$
+
+Assumindo a priori de Jeffreys com a distribuição $Beta(1,1)$ para a hipótese alternativa, substituímos
+
+Para o denominador
+
+$$
+B(1,1) = \frac{\Gamma(1)\Gamma(1)}{\Gamma(2)} = 1 
+$$
+
+
+Já o númerador:
+
+$$
+B(1+x, 1+n-x) = \frac{\Gamma(1+x)\Gamma(1+n-x)}{\Gamma(n+2)} = \frac{x!(n-x)!}{(n+1)!}
+$$
+
+
+Podemos expressar esse resultado utilizando o coeficiente binomial
+
+$$
+\frac{x!(n-x)!}{(n+1)!} = \frac{x!(n-x)!}{n!(n+1)} = \frac{1}{(n+1)\binom{n}{x}}
+$$
+
+
+Substituindo tudo isso na equação, obtemos a probabilidade a posteriori:
+
+$$
+p_x = \frac{1}{1 + \frac{1 - p_0}{p_0} \frac{\frac{1}{(n+1)\binom{n}{x}}}{(1/2)^n \cdot 1}}
+$$
+
+$$
+p_x = \frac{1}{1 + \frac{1 - p_0}{p_0} \frac{2^n}{(n+1)\binom{n}{x}}}
+$$
+
+Como feito com o *p-value* é valido observar o comportamento da probabilidade a posteriori (sob $H_0$ e sob $H_1$) conforme $n$ cresce.
+
+```{r grafico_posteriori, echo=FALSE, warning=FALSE}
+calc_posteriori_H0 <- function(x, n, a = 1, b = 1, p0 = 0.5) {
+  # ( (1 - p0) / p0 ) * ( Beta(a+x, b+n-x) / ( (1/2)^n * Beta(a,b) ) )
+  
+  # Usando ln pra não explodir
+  log_termo <- log((1 - p0) / p0) + 
+               lbeta(a + x, b + n - x) - 
+               (n * log(0.5)) - 
+               lbeta(a, b)
+
+  px <- 1 / (1 + exp(log_termo))
+  
+  return(px)}
+
+df_resultados <- data.frame()
+
+set.seed(42)
+for (n in n_valores) {
+  # Sob H0 (theta = 0.5)
+  x_h0 <- rbinom(m, size = n, prob = 0.5)
+  post_h0 <- calc_posteriori_H0(x_h0, n)
+  
+  # Sob H1 (theta ~ Beta(1,1))
+  theta_h1 <- rbeta(m, 1, 1)
+  x_h1 <- rbinom(m, size = n, prob = theta_h1)
+  post_h1 <- calc_posteriori_H0(x_h1, n)
+  
+  df_temp <- data.frame(
+    n = n,
+    posteriori = c(post_h0, post_h1),
+    cenario = c(rep("Sob H0", m), rep("Sob H1", m))
+  )
+  df_resultados <- bind_rows(df_resultados, df_temp)}
+
+df_resultados$n_factor <- factor(df_resultados$n, levels = n_valores)
+
+ggplot(df_resultados, aes(x = n_factor, y = posteriori, fill = cenario)) +
+  geom_boxplot(alpha = 0.7, outlier.size = 0.5, outlier.alpha = 0.3) +
+  scale_fill_manual(values = c("Sob H0" = "blue", "Sob H1" = "deeppink")) +
+  theme_minimal() +
+  labs(
+    title = "Probabilidade a Posteriori de H0 usando Jeffreys",
+    subtitle = "Sob H0 vs Sob H1",
+    x = "Tamanho da amostra (n)",
+    y = "P(theta = 1/2 | X = x)",
+    fill = "Cenário Simulado"
+  ) +
+  theme(legend.position = "bottom")
+```
+
+
+No gráfico acima, sob $H_0$ a mediana da probabilidade a posteriori começa ao redor de 0,6 ou 0,7 para $n$ pequeno, e vai aumentando até chegar próximo de 1, ou seja, quanto maior $n$ maior é a probabilidade de $\theta = 1/2$. Já sob $H_1$ os boxplot vão diminuindo até chegar próximo de 0. 
