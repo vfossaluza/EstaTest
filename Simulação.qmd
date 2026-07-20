@@ -7,6 +7,7 @@ format: pdf
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(scales)
 ```
 
 Seja $X_i | \theta \sim Ber(\theta)$. Nossa priori é $\theta \sim Beta(a=1, b=1)$. Desse modo $Y = \sum X_i$ é estatística suficiente.
@@ -329,3 +330,202 @@ ggplot(df_resultados, aes(x = n_factor, y = posteriori, fill = cenario)) +
 
 
 No gráfico acima, sob $H_0$ a mediana da probabilidade a posteriori começa ao redor de 0,6 ou 0,7 para $n$ pequeno, e vai aumentando até chegar próximo de 1, ou seja, quanto maior $n$ maior é a probabilidade de $\theta = 1/2$. Já sob $H_1$ os boxplot vão diminuindo até chegar próximo de 0. 
+
+### Simulação dos Erros $\alpha$ e $\beta$ para a Probabilidade a Posteriori
+
+Da mesma forma que fizemos com o *p-value*, podemos simular os erros ao utilizarmos a Probabilidade a Posteriori como regra de decisão. Nesse caso, rejeitamos $H_0$ quando $P(\theta = 1/2 \mid X = x) < 0,5$.
+
+```{r erros_posteriori, echo=FALSE, warning=FALSE}
+ns <- c(5, 10, 20, 40, 60, 80, 100, 200, 400, 600, 800, 1000)
+m <- 10000
+
+resultados_post_erros <- data.frame(n = ns, alpha = NA, beta = NA)
+
+set.seed(42)
+for(i in 1:length(ns)) {
+  n_atual <- ns[i]
+  
+  # Alpha: simular sob H0 e ver quantos < 0.5
+  y_h0 <- rbinom(m, size = n_atual, prob = 0.5)
+  post_h0 <- calc_posteriori_H0(y_h0, n = n_atual)
+  resultados_post_erros$alpha[i] <- mean(post_h0 < 0.5)
+  
+  # Beta: simular sob H1 e ver quantos >= 0.5
+  theta_h1 <- rbeta(m, 1, 1)
+  y_h1 <- rbinom(m, size = n_atual, prob = theta_h1)
+  post_h1 <- calc_posteriori_H0(y_h1, n = n_atual)
+  resultados_post_erros$beta[i] <- mean(post_h1 >= 0.5)}
+
+ggplot(resultados_post_erros, aes(x = n)) +
+  geom_line(aes(y = alpha, color = "alpha"), linewidth = 1.2) +
+  geom_point(aes(y = alpha, color = "alpha"), size = 2) +
+  geom_line(aes(y = beta, color = "beta"), linewidth = 1.2) +
+  geom_point(aes(y = beta, color = "beta"), size = 2) +
+  scale_color_manual(values = c("alpha" = "deeppink2", "beta" = "cyan3")) +
+  scale_x_continuous(breaks = c(10, 100, 200, 400, 600, 800, 1000)) +
+  labs(
+    title = "Erros do Tipo I e II para a Probabilidade a Posteriori",
+    x = "Tamanho da amostra (n)",
+    y = "Taxa de Erro",
+    color = "Erro"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "top", plot.title = element_text(face = "bold"))
+```
+
+---
+
+## Fator de Bayes
+
+O Fator de Bayes $BF(x)$ é uma razão de chances que mostra o aumento de chance de $H_0$ ser mais plausível que $H_1$ após observar os dados.
+
+$$
+BF(x)
+= \frac{f_0(x)}{f_1(x)}
+= \frac{f(x \mid \Theta_0)}{f(x \mid \Theta_1)}
+= \frac{\int_{\Theta} f(x \mid \theta)\, f(\theta \mid \Theta_0)\, d\theta}
+       {\int_{\Theta} f(x \mid \theta)\, f(\theta \mid \Theta_1)\, d\theta}
+= \frac{\int_{\Theta_0} f(x \mid \theta)\, dP_0(\theta)}
+       {\int_{\Theta_1} f(x \mid \theta)\, dP_1(\theta)}
+= \frac{E\!\left[f(x \mid \theta)\mid \theta \in \Theta_0\right]}
+       {E\!\left[f(x \mid \theta)\mid \theta \in \Theta_1\right]}.
+$$
+
+Se $BF(x) < 1$ temos indicios de rejeitar $H_0$, $H_0$. Se $BF_{01} < 1$.
+
+Uma das vantagens do $BF(x)$ é que ele é consistente, diferente do *p-value*, que conforme o tamanho da amostra $n$ cresce, ele rejeita $H_0$.
+
+Da mesma forma como foi feito para o *p-value* e para o a Probabilidade a Posteriori, vamos simular dados sob $H_0$ ($\theta = 1/2$) e dados sob $H_1$ ($\theta \sim Beta(1,1)$) para vários tamanhos de amostra $n$ e construir um boxplot comparativo.
+
+```{r fator_bayes, echo=FALSE, warning=FALSE}
+fator_bayes_01 <- function(y, n) {
+  log_bf <- lchoose(n, y) + log(n + 1) - n * log(2)
+  return(exp(log_bf))}
+
+tamanhos_n <- c(5, 10, 20, 40, 100, 200, 500)
+m <- 1000 
+resultados_bf <- data.frame()
+
+for(n_atual in tamanhos_n) {
+  
+  y_h0 <- rbinom(m, size = n_atual, prob = 0.5)
+  bf_h0 <- sapply(y_h0, fator_bayes_01, n = n_atual)
+  
+  theta_h1 <- rbeta(m, 1, 1) 
+  y_h1 <- rbinom(m, size = n_atual, prob = theta_h1)
+  bf_h1 <- sapply(y_h1, fator_bayes_01, n = n_atual)
+  
+  df_h0 <- data.frame(n = as.factor(n_atual), BF = bf_h0, Cenario = "Sob H0")
+  df_h1 <- data.frame(n = as.factor(n_atual), BF = bf_h1, Cenario = "Sob H1")
+  
+  resultados_bf <- rbind(resultados_bf, df_h0, df_h1)}
+
+ggplot(resultados_bf, aes(x = n, y = BF, fill = Cenario)) +
+  geom_boxplot(outlier.size = 0.5, outlier.alpha = 0.4, alpha = 0.8) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "black", linewidth = 1) +
+  scale_y_log10(
+    breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x))) +
+  coord_cartesian(ylim = c(1e-8, 1e2)) + 
+  scale_fill_manual(values = c("Sob H0" = "royalblue", "Sob H1" = "hotpink")) +
+  labs(
+    title = "Comportamento do Fator de Bayes",
+    x = "Tamanho da amostra (n)",
+    y = "Fator de Bayes a favor de H0\n(escala log)" ) +
+  theme_minimal(base_size = 12) + 
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold", size = 14),
+    panel.grid.minor = element_blank(),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 15))
+```
+
+Sob $H_0$ (em azul) é possível ver que, à medida que $n$ cresce, as caixas ficam acima da linha pontilhada, ou seja, $BF(x) > 1$. Desse modo, conseguimos ver que o Fator de Bayes acumula evidências a favor da hipótese nula quando ela é verdadeira.
+
+Sob $H_1$ (em rosa), as caixas correspondentes à hipótese alternativa vão despencar para baixo da linha pontilhada ($BF(x) < 1$) conforme $n$ cresce, mostrando que o modelo rapidamente descarta $H_0$ quando os dados vêm de $\theta \neq 1/2$.
+
+A linha tracejada no eixo y representa $BF = 1$, o ponto de neutralidade empírica entre as hipóteses.
+
+No gráfico acima conseguimos ver a consistência do Fator de Bayes, conforme $n$ cresce. Sob $H_0$ (boxplot azul), $\theta = 1/2$, é possível ver que, ara amostras maiores, o $FB(x)$ cresce progressivamente, acumulando forte evidência a favor de $H_0$. Sob $H_1$ (boxplot rosa), $\theta \neq 1/2$, $BF$ decai para valores próximos a zero, indicando forte apoio a $H_1$.
+
+---
+
+## Razão de Verossimilhança Generalizada (RVG)
+
+A RVG ($\lambda(\mathbf{x})$) é definida por
+
+$$
+\lambda(\mathbf{x}) = \frac{\sup_{\Theta_0} V_x(\theta)}{\sup_\Theta V_x(\theta)}
+$$
+
+Para o modelo Binomial com $H_0: \theta = 1/2$:
+
+- **Numerador ($\sup_{\Theta_0} V_x(\theta)$):** A verossimilhança calculada em $\theta_0 = 1/2$, que é $(1/2)^n$.
+
+- **Denominador ($\sup_\Theta V_x(\theta)$):** A verossimilhança calculada no Estimador de Máxima Verossimilhança (EMV) $\hat{\theta}_{MV} = y/n$, que resulta em $(y/n)^y (1 - y/n)^{n-y}$.
+
+Portanto, a estatística da RVG é dada por:
+
+$$
+\lambda(y) = \frac{(1/2)^n}{\left(\frac{y}{n}\right)^y \left(1 - \frac{y}{n}\right)^{n-y}}
+$$
+
+
+```{r rvg_simulacao, echo=FALSE, warning=FALSE}
+# RVG
+rvg_binom <- function(y, n) {
+  # Evitar problemas numéricos quando y = 0 ou y = n (pois 0^0 = 1)
+  theta_mv <- y / n
+  
+  # Log da verossimilhança no EMV (denominador)
+  log_L_max <- ifelse(y == 0 | y == n, 0, y * log(theta_mv) + (n - y) * log(1 - theta_mv))
+  
+  # Log da verossimilhança sob H0 (numerador)
+  log_L_H0 <- n * log(0.5)
+  
+  # RVG = exp(log_L_H0 - log_L_max)
+  lambda <- exp(log_L_H0 - log_L_max)
+  return(lambda)
+}
+
+tamanhos_n <- c(5, 10, 20, 40, 100, 200, 500)
+m <- 1000 
+resultados_rvg <- data.frame()
+
+set.seed(42)
+for(n_atual in tamanhos_n) {
+  
+  y_h0 <- rbinom(m, size = n_atual, prob = 0.5)
+  rvg_h0 <- sapply(y_h0, rvg_binom, n = n_atual)
+
+  theta_h1 <- rbeta(m, 1, 1)
+  y_h1 <- rbinom(m, size = n_atual, prob = theta_h1)
+  rvg_h1 <- sapply(y_h1, rvg_binom, n = n_atual)
+  
+  df_h0 <- data.frame(n = as.factor(n_atual), RVG = rvg_h0, Cenario = "Sob H0")
+  df_h1 <- data.frame(n = as.factor(n_atual), RVG = rvg_h1, Cenario = "Sob H1")
+  
+  resultados_rvg <- bind_rows(resultados_rvg, df_h0, df_h1)
+}
+
+ggplot(resultados_rvg, aes(x = n, y = RVG, fill = Cenario)) +
+  geom_boxplot(alpha = 0.7, outlier.size = 0.5, outlier.alpha = 0.3) +
+  scale_fill_manual(values = c("Sob H0" = "darkturquoise", "Sob H1" = "deeppink")) +
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(
+    title = "Razão de Verossimilhança Generalizada",
+    x = "Tamanho da amostra (n)",
+    y = expression(lambda(x)),
+    fill = ""
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom", plot.title = element_text(face = "bold"))
+```
+
+No gráfico acima podemos ver a distribuição de $\lambda(\mathbf{x})$, para diferentes tamanhos amostrais ($n$), comparando o comportamento do teste sob a hipótese nula ($H_0 : \theta = 1/2$) e sob a hipótese alternativa ($H_1 : \theta \sim \text{Beta}(1,1)$).
+
+Temos que, a RVG $\in (0, 1]$. Valores de $\lambda(\mathbf{x})$ próximos de $1$ indicam que o máximo da função de verossimilhança sob $H_0$ está muito próximo do máximo global da verossimilhança, ou seja, o EMV está próximo de $\theta_0 = 1/2$, indicando que não devemos rejeitar $H_0$. 
+
+Já valores de $\lambda(\mathbf{x})$ próximos de $0$ indicam que os dados observados são muito menos prováveis sob $H_0$, nos fazendo acreditar que devemos rejeitar $H_0$.
+
+
