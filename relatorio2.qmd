@@ -1,0 +1,571 @@
+---
+title: "Estatísticas de Testes de Hipóteses: Teoria e Aplicações"
+author: 
+    - name: "Gabriela Aimee Scarpini Silva"
+    - name: "Orientador: Victor Fossaluza"
+format: pdf
+---
+
+```{r, echo=FALSE, warning=FALSE, results='hide', message=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(scales)
+```
+
+## 1. Introdução 
+
+A inferência estatística concentra-se em dois tipos de problemas: estimação e teste de
+hipóteses, sendo o último o foco deste trabalho. Uma *hipótese estatística* é uma afirmação sobre um parâmetro $\theta$. Um teste de hipóteses consiste em um problema de decisão, em que deve-se escolher uma entre duas (ou mais) hipóteses. No caso mais comum da prática estatística, em que tem-se duas hipóteses, o espaço paramétrico é dividido em subconjuntos complementares, $\Theta_0$ e $\Theta_1 = \Theta_0^c$.  Às afirmações $H_0 : \theta \in \Theta_0$ e $H_1 : \theta \in \Theta_0^c$ dão-se os nomes de *hipótese nula* e *hipótese alternativa*, respectivamente.
+
+Na primeira parte do projeto, o trabalho consistiu em revisar e comparar teoricamente quatro medidas de  estatísticas de teste e, através de exemplos, a consistência das conclusões. Essas medidas são: a Razão de Verossimilhança Generalizada (RVG), o *p-value*, a probabilidade a posteriori de $H_0$ e o *e-value* (Full Bayesian Significance Test - FBST).
+
+Nesta parte do projeto, o objetivo passou a ser analisar, por meio de simulações de Monte Carlo, as propriedades frequentistas e bayesianas dessas medidas, incluindo uma quinta estatística de teste: o Fator de Bayes, no contexto do modelo Bernoulli com hipótese precisa $H_0: \theta = 1/2$. Esse estudo permitiu avaliar o comportamento do erro tipo I, do erro tipo II e a consistência de cada medida à medida que o tamanho amostral $n$ cresce, algo que não é possível observar apenas com a análise teórica como feito anteriormente.
+
+
+## 2. Metodologia
+
+### 2.1 Teste de Hipóteses
+
+Sejam $\mathbf{X} = (X_1, X_2, \ldots, X_n)$ variáveis aleatórias (ou seja $\mathbf{X}$ é um vetor aleatório) condicionalmente independentes e identicamente distribuídas, com função de densidade $f(x|\theta)$, $\theta \in \Theta$. Um **teste de hipóteses** $\varphi : \mathfrak{X} \rightarrow \{0, \, 1 \}$ é uma regra de decisão que especifica para quais pontos $x \in \mathcal{X}$ a hipótese $H_0: \theta \in \Theta_0$ deve ser rejeitada ($\varphi (\mathbf{x}) = 1$) ou aceita ($\varphi (\mathbf{x}) = 0$). O subconjunto do espaço amostral $\mathcal{X}$ que contém os pontos que levam à rejeição de $H_0$ ($\varphi^{-1} (\{ 1 \})$) é chamado de *região crítica* (RC) ou *região de rejeição* do teste $\varphi$.
+
+A região crítica pode ser expressa por meio de uma **estatística de teste**, $W(\mathbf{X})$, que, em geral, é função de uma estatística suficiente. Essa estatística é utilizada para ordenar o espaço amostral de modo que grandes valores de $W$ indicam pontos mais favoráveis à $H_0 : \theta \in \Theta_0$.
+
+### 2.2 Estatísticas de Teste
+
+#### 2.2.1 Razão de Verossimilhança Generalizada (RVG)
+
+Seja $V_x(\theta) = f(x|\theta)$ a função de verossimilhança. A RVG mede o quanto $H_0$ é suportada pelos dados em relação ao máximo global da verossimilhança:
+
+$$
+\lambda(\mathbf{x}) = \frac{\sup_{\Theta_0} V_x(\theta)}{\sup_{\Theta} V_x(\theta)} .
+$$
+
+Por definição, $\lambda(\mathbf{x}) \in (0,1]$, sendo igual a $1$ quando o Estimador de Máxima Verossimilhança $\hat\theta_{MV} \in \Theta_0$. Valores próximos de $1$ indicam compatibilidade com $H_0$; valores próximos de $0$ indicam evidência contra $H_0$.
+
+#### 2.2.2 p-value
+
+Dada uma estatística de teste $W(\mathbf{X})$, o *p-value* é definido como a maior probabilidade, sob $H_0$, de se observar valores da estatística de teste mais desfavoráveis à hipótese nula que aquele de fato observado ($W(\mathbf{x})$):
+
+$$
+p(x) = \sup_{\Theta_0} P(W( \mathbf{X}) \leq W(\mathbf{x}) | \theta).
+$$
+
+*p-values* pequenos indicam que o resultado observado seria improvável caso $H_0$ fosse verdadeira. Em contrapartida, *p-values* altos sugerem que os dados são compatíveis com $H_0$. 
+
+#### 2.2.3 Probabilidade a posteriori de $H_0$
+
+Sob o enfoque bayesiano, a incerteza sobre o parâmetro $\theta$ é descrita em termos de uma distribuição de probabilidade $f(\theta)$, chamada distribuição a priori. Essa incerteza é atualizada após a observação de $\mathbf{X} = \mathbf{x}$ via Teorema de Bayes
+
+$$
+f(\theta | \mathbf{x}) = \frac{f(\mathbf{x} | \theta) f(\theta)}
+{f(\mathbf{x})} 
+\propto
+V_x(\theta) f(\theta) .
+$$
+
+A probabilidade a posteriori da Hipótese $H_0$ é obtida por 
+
+$$
+\pi(\mathbf{x}) = P(\theta \in \Theta_0 | \mathbf{x}) = \int_{\Theta_0} f (\theta | \mathbf{x}) d \theta.
+$$
+
+A estatística acima é a atualização da crença inicial sobre a hipótese de $H_0$, baseada na evidência fornecida pelos dados. Diferente do *p-value*, essa quantidade possui uma interpretação de probabilidade mais clara, uma vez que, evidencia a probabilidade de a hipótese ser verdadeira, condicionada aos dados observados. Valores altos de $\pi(\mathbf{x})$ mostram forte evidência empírica a favor de $H_0$, enquanto valores baixos sugerem que $H_0$ é pouco plausível.
+
+Para o caso de testes para hipóteses precisas, a probabilidade posterior será zero. Em termos matemáticos, $P(\theta \in \Theta_0 | \mathbf{x}) = 0$, se $dim(\Theta_0) < dim(\Theta)$.
+
+#### 2.2.4 e-value (Full Bayesian Significance Test - FBST)
+
+Ainda sob a abordagem bayesiana, o *e-value* é uma medida de evidência desenvolvido especificamente para testar hipóteses precisas.
+
+A região $T_x$ representa os pontos do espaço paramétrico desfavoráveis à $H_0$, e é definido como
+
+$$
+T_x = \left\{ \theta \in \Theta : f(\theta | \mathbf{x}) > \sup_ {\Theta_0} 
+f(\theta | \mathbf{x}) \right\}.
+$$
+
+A partir disso, o *e-value* é definido por
+
+$$
+Ev(\mathbf{x}) = 1 - P(\theta \in T_x | \mathbf{x}).
+$$
+
+O FBST (Procedimento de Pereira-Stern) consiste em rejeitar $H_0$ para valores "pequenos" de $Ev(\mathbf{x})$.
+
+#### 2.2.5 Fator de Bayes
+
+Fator de Bayes $BF(x)$ é uma razão de chances que mostra o aumento de chance de $H_0$ ser mais plausível que $H_1$ após observar os dados.
+
+$$
+BF(x)
+= \frac{f_0(x)}{f_1(x)}
+= \frac{f(x \mid \Theta_0)}{f(x \mid \Theta_1)}
+= \frac{\int_{\Theta} f(x \mid \theta)\, f(\theta \mid \Theta_0)\, d\theta}
+       {\int_{\Theta} f(x \mid \theta)\, f(\theta \mid \Theta_1)\, d\theta}
+= \frac{\int_{\Theta_0} f(x \mid \theta)\, dP_0(\theta)}
+       {\int_{\Theta_1} f(x \mid \theta)\, dP_1(\theta)}
+= \frac{E\!\left[f(x \mid \theta)\mid \theta \in \Theta_0\right]}
+       {E\!\left[f(x \mid \theta)\mid \theta \in \Theta_1\right]}.
+$$
+
+
+Se $BF(\mathbf{x}) < 1$, há indícios para rejeitar $H_0$, se $BF(\mathbf{x}) > 1$, os dados favorecem $H_0$. Uma propriedade importante, explorada na simulação, é a **consistência** do Fator de Bayes: diferentemente do *p-value*, ele acumula evidência cada vez mais forte a favor de $H_0$ quando esta é verdadeira, à medida que $n$ cresce.
+
+### 2.3 Estudo de Simulação 
+
+#### 2.3.1 Modelo e Hipóteses
+
+Seja $X_i \mid \theta \sim \text{Bernoulli}(\theta)$, com priori $\theta \sim \text{Beta}(a=1, b=1)$. A estatística suficiente é $Y = \sum_i X_i$ e a distribuição a posteriori, nesse caso, é $\theta | Y = y \sim Beta(a+y, b+n-y)$. Testamos as hipóteses precisas
+
+$$H_0: \theta = 1/2 \quad \text{contra} \quad H_1: \theta \ne 1/2.$$
+
+Sob $H_0$, $Y \mid \theta \sim \text{Binomial}(n, 1/2)$. Para cada tamanho amostral $n$ (variando de $5$ a $1000$), foram geradas $m = 10000$ simulações de pares $(\mathbf{X}, \theta)_j$, $j = 1, \ldots, m$, sendo possível estimar por Monte Carlo o comportamento de cada medida de evidência e de erro associados.
+
+#### 2.3.2 p-value Simulado e Erros Tipo I e II
+
+O *p-value* bilateral foi calculado como
+
+$$
+p(y) = \begin{cases} 2\,P(Y \ge y \mid \theta=1/2), & y > n/2 \\ 2\,P(Y \le y \mid \theta=1/2), & y < n/2 \\ 1, & y = n/2. \end{cases} 
+$$
+
+O erro tipo I, $\alpha = P(\text{rejeitar } H_0 \mid \theta=1/2)$, e o erro tipo II, $\beta = P(\text{não rejeitar } H_0 \mid \theta \ne 1/2)$, foram estimados por simulação, com regra de decisão $p\text{-value} \le 0.05$.
+
+### 2.3.3 Probabilidade a Posteriori via Priori de Jeffreys
+
+Como a hipótese é precisa e a priori $\text{Beta}(1,1)$ é contínua, $P(\theta = 1/2 \mid \mathbf{x}) = 0$ para qualquer valor observado na amostra. Diante desse cenário, foi adotado a **priori de Jeffreys**, que atribui probabilidade positiva $p_0$ ao ponto $\theta_0 = 1/2$ e distribui o restante $(1-p_0)$ continuamente sob $H_1$:
+
+$$
+f_J(\theta) = p_0\, \mathbb{1}(\theta=\theta_0) + (1-p_0)\, f_\beta(\theta)\, \mathbb{1}(\theta \ne \theta_0).
+$$
+
+A distribuição preditiva correspondente é
+
+$$
+f_J(x) = p_0\binom{n}{x}\theta_0^x(1-\theta_0)^{n-x}\, \mathbb{1}(\theta=\theta_0) + (1-p_0)\binom{n}{x}\frac{B(a+x,\,b+n-x)}{B(a,b)}\, \mathbb{1}(\theta\ne\theta_0),
+$$
+
+de onde se obtém a probabilidade a posteriori geral
+
+$$
+p_x = \frac{1}{1 + \dfrac{1-p_0}{p_0}\cdot \dfrac{B(a+x,\,b+n-x)}{(1/2)^n\, B(a,b)}}.
+$$
+
+Tem-se, que as funções de beta são $B(1,1)=1$ e $B(1+x,\,1+n-x) = \dfrac{1}{(n+1)\binom{n}{x}}$, então,
+
+$$
+p_x = \frac{1}{1 + \dfrac{1-p_0}{p_0}\cdot \dfrac{2^n}{(n+1)\binom{n}{x}}}.
+$$
+
+Foi usado $p_x$ como regra de decisão (rejeita-se $H_0$ quando $P(\theta=1/2 \mid X=x) < 0.5$), os erros tipo I e tipo II foram novamente estimados por simulação, sob $H_0$ e sob $H_1$ respectivamente, para os mesmos tamanhos amostrais utilizados na análise do *p-value*.
+
+### 2.3.4 Fator de Bayes: Simulação
+
+Para cada $n$, simularam-se dados sob $H_0$ ($\theta=1/2$) e sob $H_1$ ($\theta \sim \text{Beta}(1,1)$), calculando-se o Fator de Bayes em cada cenário, o que permitiu construir boxplots comparativos (em escala log) do comportamento do Fator de Bayes conforme $n$ cresce.
+
+O Fator de Bayes é dado por,
+
+$$
+BF(x) = \frac{\dfrac{p_x}{1-p_x}}{\dfrac{p_0}{1-p_0}} =
+\frac{\dfrac{1}{\frac{1-p_0}{p_0}\frac{\beta(a+x,b+n-x)}
+{(1/2)^n\beta(a,b)}}}{\dfrac{p_0}{1-p_0}} =
+\frac{(1/2)^n\beta(a,b)}{\beta(a+x,b+n-x)}
+$$
+
+Note que, nesse caso, $BF(x)$ não depende da probabilidade a priori
+$p_0$ da hipótese $H_0$.
+
+
+### 2.3.5 RVG: Simulação
+
+Para o modelo Binomial com $H_0: \theta = 1/2$, o numerador da RVG é $(1/2)^n$ e o denominador é a verossimilhança no EMV $\hat\theta_{MV} = y/n$, resultando em
+
+$$
+\lambda(y) = \frac{(1/2)^n}{\left(\dfrac{y}{n}\right)^{y}\left(1-\dfrac{y}{n}\right)^{n-y}}.
+$$
+
+A distribuição de $\lambda(y)$ também foi simulada sob $H_0$ e sob $H_1$ para os diferentes tamanhos amostrais.
+
+## 3. Exemplo/Aplicação: Estudo de Simulação para o Modelo Bernoulli 
+
+Com o modelo, as hipóteses e a metodologia descritos, foram obtidos os seguintes resultados por simulação de Monte Carlo ($m=10000$ simulações por tamanho amostral):
+
+### 3.1 Erro Tipo I, Erro Tipo II e p-value médio em função de $n$
+
+Para $n$ variando de $5$ a $1000$, o erro tipo I ($\alpha$) permanece controlado e próximo do nível nominal, enquanto o erro tipo II ($\beta$) e o *p-value* médio diminuem progressivamente conforme $n$ cresce, mostrando o ganho de poder do teste com o aumento da amostra:
+
+```{r p-value-fn,  echo=FALSE, warning=FALSE}
+p_valor <- function(y, n) {
+  if (y > n / 2) {
+    p <- 2 * (1 - pbinom(y - 1, size = n, prob = 1/2))
+  } else if (y < n / 2) {
+    p <- 2 * pbinom(y, size = n, prob = 1/2)
+  } else {
+    p <- 1
+  }
+  p <- min(p, 1)
+  return(p)
+}
+```
+
+```{r alpha-fn,  echo=FALSE, warning=FALSE}
+# alpha: erro tipo I -- simula sob H0
+c_alpha <- function(n_atual, m) {
+  y <- rbinom(m, size = n_atual, prob = 1/2)
+  pvals <- sapply(y, p_valor, n = n_atual)
+  alpha <- mean(pvals <= 0.05)
+  return(alpha)
+}
+```
+
+```{r beta-fn,  echo=FALSE, warning=FALSE}
+# beta: erro tipo II -- simula sob H1 (theta ~ Beta(a,b))
+c_beta <- function(n_atual, m, a = 1, b = 1) {
+  theta <- rbeta(m, a, b)
+  y <- rbinom(m, size = n_atual, prob = theta)
+  pvals <- sapply(y, p_valor, n = n_atual)
+  beta <- mean(pvals > 0.05)
+  return(beta)
+}
+```
+
+```{r grafico_posicao, echo=FALSE, warning=FALSE}
+ns <- c(5, 10, 20, 40, 60, 80, 100, 200, 400, 600, 800, 1000)
+m <- 10000
+
+resultados <- data.frame(
+  n = ns,
+  alpha = NA,
+  beta = NA,
+  pvalor_medio = NA)
+
+# ---------------------------------------
+
+for(i in 1:length(ns)){
+  n_atual <- ns[i]
+  
+  resultados$alpha[i] <- c_alpha(n_atual, m) # alpha
+  
+  resultados$beta[i] <- c_beta(n_atual, m) # beta
+  
+  y <- rbinom(m, size = n_atual, prob = 1/2) # p-value médio sob H0
+  pvals <- sapply(y, p_valor, n = n_atual)
+  resultados$pvalor_medio[i] <- mean(pvals)}
+
+# ---------------------------------------
+
+ggplot(resultados, aes(x = n)) +
+  geom_line(aes(y = alpha, color = "alpha_medio"), size = 1.2) +
+  geom_point(aes(y = alpha, color = "alpha_medio"), size = 2) +
+  
+  geom_line(aes(y = beta, color = "beta_medio"), size = 1.2) +
+  geom_point(aes(y = beta, color = "beta_medio"), size = 2) +
+
+  geom_line(aes(y = pvalor_medio, color = "pvalor_medio"), size = 1.2) +
+  geom_point(aes(y = pvalor_medio, color = "pvalor_medio"), size = 2) +
+
+  scale_color_manual(values = c(
+    "alpha_medio" = "deeppink2",
+    "beta_medio" = "cyan3",
+    "pvalor_medio" = "coral")) +
+  
+  scale_x_continuous(breaks = ns) +
+
+  labs(
+    title = "Erros e p-value",
+    x = "Tamanho da amostra (n)",
+    y = "Valor",
+    color = "Variável") +
+
+  theme_minimal(base_size = 14)
+```
+
+### 3.2 Distribuição dos p-values sob $H_1$
+
+O boxplot dos *p-values* simulados sob $H_1$, para diferentes tamanhos amostrais, evidencia a concentração crescente de valores próximos de zero à medida que $n$ aumenta, confirmando que o teste rejeita $H_0$ com maior frequência conforme a amostra cresce:
+
+```{r grafico_dispersao, echo=FALSE, warning=FALSE}
+# Simular sob H1 usando a priori Beta(1,1)
+simular_h1 <- function(n_atual, m) {
+  theta <- rbeta(m, 1, 1)                  # Sorteia theta da Beta(1,1)
+  y <- rbinom(m, size = n_atual, prob = theta) # Simula Y dado theta
+  pvals <- sapply(y, p_valor, n = n_atual) # Calcula os p-valores
+  return(pvals)
+}
+
+n_valores <- c(5, 10, 20, 40, 100, 200, 500) 
+m <- 10000 
+
+# Tabela
+tabela_p_valores <- data.frame(n = n_valores)
+matriz_p_valores <- matrix(nrow = length(n_valores), ncol = m)
+
+set.seed(123) 
+for (i in 1:length(n_valores)) {
+  matriz_p_valores[i, ] <- simular_h1(n_valores[i], m)}
+
+# As colunas vão de p_val_1 até p_val_10000
+colnames(matriz_p_valores) <- paste0("p_val_", 1:m)
+tabela_p_valores <- cbind(tabela_p_valores, matriz_p_valores)
+
+df_long <- tabela_p_valores %>%
+  pivot_longer(cols = starts_with("p_val"), 
+               names_to = "simulacao", 
+               values_to = "p_valor")
+
+# Calculando a média para a linha
+df_medias <- df_long %>%
+  group_by(n) %>%
+  summarise(p_valor_medio = mean(p_valor))
+
+# Transformando n em fator para o eixo X do boxplot ficar espaçado corretamente
+df_long$n_factor <- factor(df_long$n, levels = n_valores)
+df_medias$n_factor <- factor(df_medias$n, levels = n_valores)
+
+ggplot(df_long, aes(x = n_factor, y = p_valor)) +
+  geom_jitter(width = 0.2, alpha = 0.05, color = "steelblue", size = 0.5) +
+  geom_boxplot(outlier.shape = NA, fill = "white", alpha = 0.7, color = "black") +
+  geom_line(data = df_medias, aes(x = n_factor, y = p_valor_medio, group = 1), 
+            color = "deeppink", linewidth = 1.2) +
+  geom_point(data = df_medias, aes(x = n_factor, y = p_valor_medio), 
+             color = "deeppink", size = 3) +
+  theme_minimal() +
+  labs(title = "Distribuição dos p-values Fora de H0",
+       x = "Tamanho da amostra (n)",
+       y = "P-value Simulado")
+```
+
+
+### 3.3 Probabilidade a Posteriori (Jeffreys) sob $H_0$ e $H_1$
+
+Utilizando a priori de Jeffreys, foi simulado o comportamento de $p_x$ sob $H_0$ e sob $H_1$. Sob $H_0$, a mediana da probabilidade a posteriori começa em torno de 0.65 para $n$ pequeno e cresce até próximo de $1$; sob $H_1$, os boxplots diminuem progressivamente até próximo de 0:
+
+```{r grafico_posteriori, echo=FALSE, warning=FALSE}
+calc_posteriori_H0 <- function(x, n, a = 1, b = 1, p0 = 0.5) {
+  # ( (1 - p0) / p0 ) * ( Beta(a+x, b+n-x) / ( (1/2)^n * Beta(a,b) ) )
+  
+  # Usando ln pra não explodir
+  log_termo <- log((1 - p0) / p0) + 
+               lbeta(a + x, b + n - x) - 
+               (n * log(0.5)) - 
+               lbeta(a, b)
+
+  px <- 1 / (1 + exp(log_termo))
+  
+  return(px)}
+
+df_resultados <- data.frame()
+
+set.seed(42)
+for (n in n_valores) {
+  # Sob H0 (theta = 0.5)
+  x_h0 <- rbinom(m, size = n, prob = 0.5)
+  post_h0 <- calc_posteriori_H0(x_h0, n)
+  
+  # Sob H1 (theta ~ Beta(1,1))
+  theta_h1 <- rbeta(m, 1, 1)
+  x_h1 <- rbinom(m, size = n, prob = theta_h1)
+  post_h1 <- calc_posteriori_H0(x_h1, n)
+  
+  df_temp <- data.frame(
+    n = n,
+    posteriori = c(post_h0, post_h1),
+    cenario = c(rep("Sob H0", m), rep("Sob H1", m))
+  )
+  df_resultados <- bind_rows(df_resultados, df_temp)}
+
+df_resultados$n_factor <- factor(df_resultados$n, levels = n_valores)
+
+ggplot(df_resultados, aes(x = n_factor, y = posteriori, fill = cenario)) +
+  geom_boxplot(alpha = 0.7, outlier.size = 0.5, outlier.alpha = 0.3) +
+  scale_fill_manual(values = c("Sob H0" = "blue", "Sob H1" = "deeppink")) +
+  theme_minimal() +
+  labs(
+    title = "Probabilidade a Posteriori de H0 usando Jeffreys",
+    subtitle = "Sob H0 vs Sob H1",
+    x = "Tamanho da amostra (n)",
+    y = "P(theta = 1/2 | X = x)",
+    fill = "Cenário Simulado"
+  ) +
+  theme(legend.position = "bottom")
+```
+
+### 3.4 Erros Tipo I e II para a Probabilidade a Posteriori
+
+Usando a regra de decisão baseada em $p_x < 0.5$, o erro tipo I cai rapidamente para valores próximos de zero, enquanto o erro tipo II diminui de forma mais lenta, estabilizando-se em um patamar (em torno de 0.08-0.10) mesmo para amostras grandes:
+
+```{r erros_posteriori, echo=FALSE, warning=FALSE}
+ns <- c(5, 10, 20, 40, 60, 80, 100, 200, 400, 600, 800, 1000)
+m <- 10000
+
+resultados_post_erros <- data.frame(n = ns, alpha = NA, beta = NA)
+
+set.seed(42)
+for(i in 1:length(ns)) {
+  n_atual <- ns[i]
+  
+  # Alpha: simular sob H0 e ver quantos < 0.5
+  y_h0 <- rbinom(m, size = n_atual, prob = 0.5)
+  post_h0 <- calc_posteriori_H0(y_h0, n = n_atual)
+  resultados_post_erros$alpha[i] <- mean(post_h0 < 0.5)
+  
+  # Beta: simular sob H1 e ver quantos >= 0.5
+  theta_h1 <- rbeta(m, 1, 1)
+  y_h1 <- rbinom(m, size = n_atual, prob = theta_h1)
+  post_h1 <- calc_posteriori_H0(y_h1, n = n_atual)
+  resultados_post_erros$beta[i] <- mean(post_h1 >= 0.5)}
+
+ggplot(resultados_post_erros, aes(x = n)) +
+  geom_line(aes(y = alpha, color = "alpha_medio"), linewidth = 1.2) +
+  geom_point(aes(y = alpha, color = "alpha_medio"), size = 2) +
+  geom_line(aes(y = beta, color = "beta_medio"), linewidth = 1.2) +
+  geom_point(aes(y = beta, color = "beta_medio"), size = 2) +
+  scale_color_manual(values = c("alpha_medio" = "deeppink2", "beta_medio" = "cyan3")) +
+  scale_x_continuous(breaks = c(10, 100, 200, 400, 600, 800, 1000)) +
+  labs(
+    title = "Erros do Tipo I e II para a Posteriori",
+    x = "Tamanho da amostra (n)",
+    y = "Taxa de Erro",
+    color = "Erro"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "top", plot.title = element_text(face = "bold"))
+```
+
+
+### 3.5 Comportamento do Fator de Bayes
+
+Simulando dados sob $H_0$ e sob $H_1$, observa-se que, sob $H_0$, o Fator de Bayes cresce acima de $1$ conforme $n$ aumenta, acumulando forte evidência a favor da hipótese nula verdadeira; sob $H_1$, o Fator de Bayes cai para valores próximos de zero, indicando forte suporte a $H_1$. 
+
+
+```{r fator_bayes, echo=FALSE, warning=FALSE}
+fator_bayes_01 <- function(y, n) {
+  log_bf <- lchoose(n, y) + log(n + 1) - n * log(2)
+  return(exp(log_bf))}
+
+tamanhos_n <- c(5, 10, 20, 40, 100, 200, 500)
+m <- 1000 
+resultados_bf <- data.frame()
+
+for(n_atual in tamanhos_n) {
+  
+  y_h0 <- rbinom(m, size = n_atual, prob = 0.5)
+  bf_h0 <- sapply(y_h0, fator_bayes_01, n = n_atual)
+  
+  theta_h1 <- rbeta(m, 1, 1) 
+  y_h1 <- rbinom(m, size = n_atual, prob = theta_h1)
+  bf_h1 <- sapply(y_h1, fator_bayes_01, n = n_atual)
+  
+  df_h0 <- data.frame(n = as.factor(n_atual), BF = bf_h0, Cenario = "Sob H0")
+  df_h1 <- data.frame(n = as.factor(n_atual), BF = bf_h1, Cenario = "Sob H1")
+  
+  resultados_bf <- rbind(resultados_bf, df_h0, df_h1)}
+
+ggplot(resultados_bf, aes(x = n, y = BF, fill = Cenario)) +
+  geom_boxplot(outlier.size = 0.5, outlier.alpha = 0.4, alpha = 0.8) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "black", linewidth = 1) +
+  scale_y_log10(
+    breaks = trans_breaks("log10", function(x) 10^x),
+    labels = trans_format("log10", math_format(10^.x))) +
+ # coord_cartesian(ylim = c(1e-8, 1e2)) + 
+  coord_cartesian(ylim = c(1e-12, 1e3)) +
+  scale_fill_manual(values = c("Sob H0" = "royalblue", "Sob H1" = "deeppink")) +
+  labs(
+    title = "Comportamento do Fator de Bayes",
+    x = "Tamanho da amostra (n)",
+    y = "Fator de Bayes a favor de H0" ) +
+  theme_minimal(base_size = 12) + 
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold", size = 14),
+    panel.grid.minor = element_blank(),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 15))
+```
+
+### 3.6 Distribuição da RVG
+
+A distribuição simulada de $\lambda(x)$ para o modelo Binomial mostra padrão semelhante ao do Fator de Bayes: sob $H_0$, os valores permanecem relativamente altos (próximos de $1$) mesmo para $n$ grande, já sob $H_1$, os valores caem em direção a $0$ conforme $n$ cresce, ou seja, $\lambda(x)$ próximo de $1$ indica não rejeição, enquanto $\lambda(x)$ próximo de $0$ indica rejeição de $H_0$:
+
+
+```{r rvg_simulacao, echo=FALSE, warning=FALSE}
+# RVG
+rvg_binom <- function(y, n) {
+  # Evitar problemas numéricos quando y = 0 ou y = n (pois 0^0 = 1)
+  theta_mv <- y / n
+  
+  # Log da verossimilhança no EMV (denominador)
+  log_L_max <- ifelse(y == 0 | y == n, 0, y * log(theta_mv) + (n - y) * log(1 - theta_mv))
+  
+  # Log da verossimilhança sob H0 (numerador)
+  log_L_H0 <- n * log(0.5)
+  
+  # RVG = exp(log_L_H0 - log_L_max)
+  lambda <- exp(log_L_H0 - log_L_max)
+  return(lambda)
+}
+
+tamanhos_n <- c(5, 10, 20, 40, 100, 200, 500)
+m <- 1000 
+resultados_rvg <- data.frame()
+
+set.seed(42)
+for(n_atual in tamanhos_n) {
+  
+  y_h0 <- rbinom(m, size = n_atual, prob = 0.5)
+  rvg_h0 <- sapply(y_h0, rvg_binom, n = n_atual)
+
+  theta_h1 <- rbeta(m, 1, 1)
+  y_h1 <- rbinom(m, size = n_atual, prob = theta_h1)
+  rvg_h1 <- sapply(y_h1, rvg_binom, n = n_atual)
+  
+  df_h0 <- data.frame(n = as.factor(n_atual), RVG = rvg_h0, Cenario = "Sob H0")
+  df_h1 <- data.frame(n = as.factor(n_atual), RVG = rvg_h1, Cenario = "Sob H1")
+  
+  resultados_rvg <- bind_rows(resultados_rvg, df_h0, df_h1)
+}
+
+ggplot(resultados_rvg, aes(x = n, y = RVG, fill = Cenario)) +
+  geom_boxplot(alpha = 0.7, outlier.size = 0.5, outlier.alpha = 0.3) +
+  scale_fill_manual(values = c("Sob H0" = "darkturquoise", "Sob H1" = "deeppink")) +
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(
+    title = "Razão de Verossimilhança Generalizada",
+    x = "Tamanho da amostra (n)",
+    y = expression(lambda(x)),
+    fill = ""
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom", plot.title = element_text(face = "bold"))
+```
+
+
+## 4. Conclusões
+
+A análise de simulação realizada nesta etapa do projeto, para o modelo Bernoulli com hipótese precisa $H_0:\theta=1/2$, permitiu  observar o comportamento e as propriedades de cada medida.
+
+De forma geral, os resultados reforçam que, embora as cinco estatísticas de teste muitas vezes concordem sobre a direção da evidência, elas diferem em propriedades importantes, como consistência e interpretabilidade probabilística.
+
+A continuidade do projeto focará na aplicação prática das metodologias em dados reais provenientes do Centro de Estatística Aplicada (IME-USP) para a comparação de decisões inferenciais com base em diferentes métricas de evidência.
+
+Desse modo, espera-se consolidar a interpretação das estatísticas de teste, fornecendo ferramentas interpretativas que contribuam na tomada de decisão em problemas de teste de hipótese.
+
+## 5. Bibliografia 
+
+[1]  Fossaluza, V., Izbicki, R., da Silva, G. M. and Esteves, L. G. Coherent hypothesis testing. The American Statistician, 71(3), pp.242-248, 2017.
+
+[2] Pereira, C. A. de B., Stern, J. M., & Wechsler, S. Can a significance test be genuinely Bayesian? Bayesian Analysis, 3(1), 79–100, 2008.
+
+[3] Pereira, C. A. B., Stern, J. M. Evidence and credibility: Full bayesian significance test for precise hypotheses. Entropy, I(4):99-110, 1999.
+
+[4] Stern, J. M. Bayesian evidence test for precise hypotheses. Journal of Statistical Planning and Inference, 117(2), 185–198, 2003.
+
+[5]  Schervish, M. J. P-values: what they are and What they are not. The American Statistician, 50, 203–206, 1996.
+
+[6] Madruga, M. R. Teste de significância: uma proposta genuinamente bayesiana. Tese (Doutorado), Instituto de Matemática e Estatística, Universidade de São Paulo (USP), 2002.
+
+[7] Statistical Inference. Casella, G.; Berger, R. L. Statistical Inference. 2nd ed. Pacific Grove: Duxbury Press, 2002.
+
+[8] Probability and Statistics. DeGroot, M. H.; Schervish, M. J. Probability and Statistics. 4th ed. Boston: Addison-Wesley, 2010.
+
+

@@ -1,0 +1,57 @@
+---
+title: "Banner imagens"
+author: "Gabriela Scarpini"
+date: "2026-09-30"
+output: pdf_document
+---
+
+```{r}
+library(ggplot2)
+library(patchwork) 
+```
+
+```{r graficos_ev, echo=FALSE, warning=FALSE, dev='png', fig.path='./', fig.width=8, fig.height=4}
+x <- seq(0, 1, length.out = 1000)
+y1 <- dbeta(x, shape1 = 3, shape2 = 7) 
+y2 <- dbeta(x, shape1 = 7, shape2 = 3)
+
+par(mfrow = c(1,2)) 
+
+# --- Gráfico 1: Sup em H0 ---
+plot(x, y1, type = "l", lwd = 2, xlab = expression(theta), ylab = expression(f(theta * "|" * x)), 
+     main = "Sup em H0", axes = FALSE)
+axis(1, at = c(0, 0.5, 1), labels = c("0", "1/2", "1"))
+axis(2)
+
+theta_hat <- x[which.max(y1)]
+lines(c(theta_hat, theta_hat), c(0, max(y1)), lty = 2)
+
+abline(v = 0.5, lty = 2, col = "gray")
+
+text(0.75, max(y1)/2, expression(T[x] == "\u00D8"), col = "brown", cex = 1.2)
+
+
+# --- Gráfico 2: Sup na fronteira ---
+plot(x, y2, type = "l", lwd = 2, xlab = expression(theta), ylab = expression(f(theta * "|" * x)), 
+     main = "Sup na fronteira", axes = FALSE)
+axis(1, at = c(0, 0.5, 1), labels = c("0", "1/2", "1"))
+axis(2)
+
+tx_val <- dbeta(0.5, 7, 3)
+points(0.5, tx_val, pch = 19, col = "brown")
+lines(c(0.5, 0.5), c(0, tx_val), lty = 2)
+
+x_upper <- max(x[y2 >= tx_val])
+
+segments(0.5, tx_val, x_upper, tx_val, lty = 2) 
+lines(c(x_upper, x_upper), c(0, tx_val), lty = 2)
+
+abline(v = 0.5, lty = 2, col = "gray")
+
+T_x_vals <- x[y2 > tx_val]
+lines(c(min(T_x_vals), max(T_x_vals)), c(0, 0), lwd = 6, col = "brown")
+
+text(mean(T_x_vals), -0.25, expression(T[x]), col = "brown", xpd = TRUE, cex = 1.2)
+
+```
+

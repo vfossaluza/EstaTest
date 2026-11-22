@@ -1,0 +1,12 @@
+/*-- Additional custom styles --*/
+p {
+  text-align: justify;
+  text-justify: inter-word;
+}
+/* Extra CSS */
+.small {
+  font-size: 80%;
+}
+.extrasmall {
+  font-size: 60%;
+}

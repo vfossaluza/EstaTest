@@ -1,0 +1,187 @@
+---
+title: "Inconsistência entre ANOVA e Comparações Par a Par"
+subtitle: "Estatísticas de Testes de Hipóteses: Teoria e Aplicações"
+output:
+  pdf_document
+lang: pt-BR
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.align = "center", fig.width = 6, fig.height = 3.8)
+library(MASS)     # bases survey e Cars93
+library(ggplot2)
+```
+
+# 1. Introdução
+
+Nas etapas anteriores do projeto, cada medida de evidência foi estudada para uma única hipótese. Na prática, porém, é comum testar **várias hipóteses relacionadas entre si** com os mesmos dados. O caso clássico é a ANOVA de um fator seguida de comparações múltiplas: testa-se primeiro a igualdade de todas as médias e depois as médias duas a duas.
+
+Como as hipóteses estão logicamente encaixadas, espera-se que as decisões também sejam logicamente compatíveis. Este documento mostra, com uma base de dados do R, uma situação em que isso **não** acontece: a hipótese global é rejeitada, mas nenhuma das hipóteses par a par é rejeitada.
+
+# 2. Teoria
+
+## 2.1 Modelo e hipóteses
+
+Considere $k = 3$ grupos e $X_{ij} \mid \theta \sim N(\mu_i, \sigma^2)$, $i = 1, 2, 3$, $j = 1, \dots, n_i$, condicionalmente independentes, com $N = n_1 + n_2 + n_3$. O parâmetro é $\theta = (\mu_1, \mu_2, \mu_3, \sigma^2) \in \Theta = \mathbb{R}^3 \times \mathbb{R}_+$.
+
+A hipótese global da ANOVA é
+$$
+H_0 : \theta \in \Theta_0, \qquad \Theta_0 = \{\theta \in \Theta : \mu_1 = \mu_2 = \mu_3\},
+$$
+e as hipóteses par a par são
+$$
+H_0^{(il)} : \theta \in \Theta_0^{(il)}, \qquad \Theta_0^{(il)} = \{\theta \in \Theta : \mu_i = \mu_l\}, \quad (i,l) \in \{(1,2), (1,3), (2,3)\}.
+$$
+
+Note que $\Theta_0 \subset \Theta_0^{(il)}$ para todo par e que
+$$
+\Theta_0 = \Theta_0^{(12)} \cap \Theta_0^{(13)} \cap \Theta_0^{(23)},
+$$
+isto é, $H_0$ é verdadeira se, e somente se, todas as hipóteses par a par forem verdadeiras.
+
+## 2.2 Estatísticas de teste
+
+**Teste F (global).** Com $SQE = \sum_i n_i(\bar X_{i\cdot} - \bar X_{\cdot\cdot})^2$ e $SQR = \sum_i \sum_j (X_{ij} - \bar X_{i\cdot})^2$,
+$$
+F(\mathbf{x}) = \frac{SQE/(k-1)}{SQR/(N-k)} \;\overset{H_0}{\sim}\; F_{k-1,\,N-k}.
+$$
+
+Esse teste coincide com o teste da RVG. Como sob normalidade $\sup_{\Theta} V_x(\theta) \propto SQR^{-N/2}$ e $\sup_{\Theta_0} V_x(\theta) \propto SQT^{-N/2}$, com $SQT = SQE + SQR$,
+$$
+\lambda(\mathbf{x}) = \frac{\sup_{\Theta_0} V_x(\theta)}{\sup_{\Theta} V_x(\theta)} = \left(\frac{SQR}{SQT}\right)^{N/2} = \left(1 + \frac{k-1}{N-k}\, F(\mathbf{x})\right)^{-N/2},
+$$
+que é uma função decrescente de $F$. Rejeitar $H_0$ para $\lambda(\mathbf{x})$ pequeno equivale a rejeitar para $F(\mathbf{x})$ grande.
+
+**Testes par a par.** Para $H_0^{(il)}$ usa-se a estatística t com variância combinada,
+$$
+T_{il}(\mathbf{x}) = \frac{\bar X_{i\cdot} - \bar X_{l\cdot}}{\sqrt{QMR\left(\frac{1}{n_i} + \frac{1}{n_l}\right)}}, \qquad QMR = \frac{SQR}{N-k},
+$$
+e o p-value $p_{il}(\mathbf{x})$ é corrigido para comparações múltiplas. Neste documento usamos a correção de **Bonferroni**, $p^{B}_{il}(\mathbf{x}) = \min\{1,\, 3\, p_{il}(\mathbf{x})\}$, e, como comparação, o procedimento de **Tukey (HSD)**. Em todos os testes, a regra de decisão é $\varphi(\mathbf{x}) = 1$ se o p-value for $\le 0.05$.
+
+## 2.3 Coerência lógica entre testes
+
+Fossaluza et al. (2017) e Izbicki & Esteves (2015) discutem propriedades que uma família de testes $\{\varphi_{H}\}$ deveria satisfazer para que as conclusões sejam logicamente coerentes. Duas delas são relevantes aqui.
+
+* **Monotonicidade:** se $\Theta_0 \subset \Theta_0'$ e $\varphi_{H_0'}(\mathbf{x}) = 1$, então $\varphi_{H_0}(\mathbf{x}) = 1$. Rejeitar "$\mu_1 = \mu_2$" deveria implicar rejeitar "$\mu_1 = \mu_2 = \mu_3$".
+* **Consonância na interseção:** se $\varphi_{H_0'}(\mathbf{x}) = 0$ e $\varphi_{H_0''}(\mathbf{x}) = 0$, então $\varphi_{H_0' \wedge H_0''}(\mathbf{x}) = 0$. Se não rejeitamos $\mu_1 = \mu_2$ nem $\mu_2 = \mu_3$, não deveríamos rejeitar $\mu_1 = \mu_2 = \mu_3$, pois essa hipótese é exatamente a interseção das duas.
+
+A inconsistência estudada aqui é a **violação da consonância na interseção**:
+$$
+\varphi_{H_0}(\mathbf{x}) = 1 \quad \text{e} \quad \varphi_{H_0^{(il)}}(\mathbf{x}) = 0 \;\; \text{para todo par } (i,l).
+$$
+Ela surge porque o teste F e os testes par a par usam estatísticas, distribuições de referência e correções de nível diferentes. A região crítica do teste F não está contida na união das regiões críticas dos testes par a par.
+
+# 3. Exemplo: frequência cardíaca × prática de exercícios
+
+Usamos a base `survey` do pacote `MASS`, que vem instalado com o R. Ela contém respostas de 237 estudantes de Estatística da Universidade de Adelaide. As variáveis usadas são:
+
+* `Pulse`: frequência cardíaca (batimentos por minuto);
+* `Exer`: frequência com que o estudante pratica exercícios (`None`, `Some`, `Freq`).
+
+```{r dados}
+dados <- na.omit(survey[, c("Pulse", "Exer")])
+dados$Exer <- factor(dados$Exer, levels = c("None", "Some", "Freq"))
+
+aggregate(Pulse ~ Exer, data = dados,
+          FUN = function(v) c(n = length(v), media = mean(v), dp = sd(v)))
+```
+
+Assim, $\mu_1$, $\mu_2$ e $\mu_3$ são as frequências cardíacas médias dos grupos `None`, `Some` e `Freq`, respectivamente.
+
+```{r boxplot}
+ggplot(dados, aes(x = Exer, y = Pulse)) +
+  geom_boxplot(fill = "#4FD1C5", alpha = 0.7) +
+  stat_summary(fun = mean, geom = "point", color = "#E91E8C", size = 3) +
+  labs(x = "Prática de exercícios", y = "Pulso (bpm)",
+       title = "Pulso por grupo (ponto rosa = média)") +
+  theme_minimal()
+```
+
+## 3.1 Pressupostos
+
+```{r pressupostos}
+ajuste <- aov(Pulse ~ Exer, data = dados)
+bartlett.test(Pulse ~ Exer, data = dados)   # homogeneidade de variâncias
+shapiro.test(residuals(ajuste))             # normalidade dos resíduos
+```
+
+Nenhum dos dois testes rejeita seus pressupostos ao nível de 5%, então o modelo da Seção 2.1 é razoável para esses dados.
+
+## 3.2 Teste global: $H_0: \mu_1 = \mu_2 = \mu_3$
+
+```{r anova}
+summary(ajuste)
+
+tab <- anova(ajuste)
+F_obs <- tab$`F value`[1]
+N <- nrow(dados); k <- nlevels(dados$Exer)
+lambda <- (1 + (k - 1) / (N - k) * F_obs)^(-N / 2)
+c(F = F_obs, p_value = tab$`Pr(>F)`[1], RVG = lambda)
+```
+
+O p-value é menor que 0.05, então **rejeitamos $H_0$**: há evidência de que as médias não são todas iguais.
+
+## 3.3 Testes par a par: $H_0^{(il)}: \mu_i = \mu_l$
+
+```{r parapar}
+# Bonferroni (t com variância combinada)
+pairwise.t.test(dados$Pulse, dados$Exer, p.adjust.method = "bonferroni")
+```
+
+Com a correção de Bonferroni, **nenhuma** das três hipóteses par a par é rejeitada: todos os p-values ajustados são maiores que 0.05.
+
+```{r resumo, echo=FALSE}
+pb <- pairwise.t.test(dados$Pulse, dados$Exer, p.adjust.method = "bonferroni")$p.value
+res <- data.frame(
+  Hipotese = c("mu1 = mu2 = mu3",
+               "mu1 = mu2 (None = Some)",
+               "mu1 = mu3 (None = Freq)",
+               "mu2 = mu3 (Some = Freq)"),
+  p_value  = round(c(tab$`Pr(>F)`[1], pb["Some", "None"],
+                     pb["Freq", "None"], pb["Freq", "Some"]), 4)
+)
+res$Decisao <- ifelse(res$p_value <= 0.05, "Rejeita H0", "Não rejeita H0")
+knitr::kable(res, caption = "Decisões ao nível de 5% (pares com correção de Bonferroni)")
+```
+
+A tabela mostra a inconsistência: rejeitamos que as três médias são iguais, mas não conseguimos apontar nenhum par de médias diferente. Como $\Theta_0 = \Theta_0^{(12)} \cap \Theta_0^{(13)} \cap \Theta_0^{(23)}$, aceitar todas as hipóteses par a par equivale, logicamente, a aceitar $H_0$, o que contradiz a decisão do teste F.
+
+## 3.4 Observação: dependência do procedimento
+
+A inconsistência depende de como os pares são corrigidos:
+
+```{r tukey}
+TukeyHSD(ajuste)
+pairwise.t.test(dados$Pulse, dados$Exer, p.adjust.method = "none")
+```
+
+Nesta base, o Tukey (menos conservador que Bonferroni) rejeita $\mu_2 = \mu_3$ com p-value muito próximo de 0.05. Sem nenhuma correção, o mesmo par também é rejeitado, mas aí o erro tipo I da família de testes não é controlado. A inconsistência aparece justamente na tentativa de controlar o erro global: quanto mais conservadora a correção, maior a chance de o teste F rejeitar sem que nenhum par seja rejeitado.
+
+# 4. Exemplo adicional: inconsistência também com Tukey
+
+Na base `Cars93` (pacote `MASS`), a inconsistência aparece tanto com Bonferroni quanto com Tukey. A variável resposta é o consumo na estrada (`MPG.highway`, em milhas por galão) e os grupos são os tipos de airbag (`AirBags`).
+
+```{r cars93}
+fit2 <- aov(MPG.highway ~ AirBags, data = Cars93)
+summary(fit2)
+TukeyHSD(fit2)
+pairwise.t.test(Cars93$MPG.highway, Cars93$AirBags, p.adjust.method = "bonferroni")
+bartlett.test(MPG.highway ~ AirBags, data = Cars93)
+```
+
+O teste F rejeita $H_0$ (p-value $\approx 0.036$), mas nenhum par é rejeitado por Tukey ($\min p \approx 0.052$) nem por Bonferroni ($\min p \approx 0.06$). Uma ressalva: aqui o teste de Bartlett rejeita a homogeneidade das variâncias. Por isso, este exemplo serve bem para ilustrar o fenômeno, mas o da Seção 3 é mais adequado para uma análise formal.
+
+# 5. Conclusão
+
+Os exemplos mostram que a combinação "ANOVA + comparações múltiplas", muito usada na prática, pode levar a conclusões logicamente incoerentes: rejeita-se $\mu_1 = \mu_2 = \mu_3$, mas aceitam-se todas as igualdades $\mu_i = \mu_l$, cuja interseção é exatamente $H_0$. Essa é uma violação da consonância na interseção. Ela motiva, na continuidade do projeto, investigar como as demais medidas de evidência (probabilidade a posteriori, e-value e Fator de Bayes) se comportam em relação a essas propriedades de coerência no contexto de comparação de médias.
+
+# Referências
+
+[1] Fossaluza, V., Izbicki, R., da Silva, G. M. and Esteves, L. G. Coherent hypothesis testing. *The American Statistician*, 71(3), pp. 242–248, 2017.
+
+[2] Izbicki, R. and Esteves, L. G. Logical consistency in simultaneous statistical test procedures. *Logic Journal of the IGPL*, 23(5), pp. 732–758, 2015.
+
+[3] Venables, W. N. and Ripley, B. D. *Modern Applied Statistics with S*. 4th ed. New York: Springer, 2002. (pacote `MASS`)
+
+[4] Casella, G.; Berger, R. L. *Statistical Inference*. 2nd ed. Pacific Grove: Duxbury Press, 2002.

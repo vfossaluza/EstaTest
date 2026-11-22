@@ -1,0 +1,85 @@
+---
+title: "Anova"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      fig.align = "center", fig.width = 6, fig.height = 3.8)
+library(MASS)    
+library(ggplot2)
+```
+
+
+## Base usada
+
+Base `survey` do pacote `MASS`. A base contém respostas de 237 estudantes de Estatística da Universidade de Adelaide. As variáveis usadas são:
+
+- `Pulse`: frequência cardíaca (batimentos por minuto);
+- `Exer`: frequência com que o estudante pratica exercícios (`None`, `Some`, `Freq`).
+
+```{r dados}
+dados <- na.omit(survey[, c("Pulse", "Exer")])
+dados$Exer <- factor(dados$Exer, levels = c("None", "Some", "Freq"))
+
+aggregate(Pulse ~ Exer, data = dados,
+          FUN = function(v) c(n = length(v), media = mean(v), dp = sd(v)))
+```
+
+Assim, $\mu_1$, $\mu_2$ e $\mu_3$ são as frequências cardíacas médias dos grupos `None`, `Some` e `Freq`, respectivamente.
+
+```{r boxplot}
+ggplot(dados, aes(x = Exer, y = Pulse)) +
+  geom_boxplot(fill = "#4FD1C5", alpha = 0.7) +
+  stat_summary(fun = mean, geom = "point", color = "#E91E8C", size = 3) +
+  labs(x = "Prática de exercícios", y = "Pulso (bpm)",
+       title = "Pulso por grupo (ponto rosa = média)") +
+  theme_minimal()
+```
+
+Testes que fazemos na anova.
+
+```{r pressupostos}
+ajuste <- aov(Pulse ~ Exer, data = dados)
+bartlett.test(Pulse ~ Exer, data = dados)   # homogeneidade de variâncias
+shapiro.test(residuals(ajuste))             # normalidade dos resíduos
+```
+
+Nenhum dos dois testes rejeita seus pressupostos ao nível de 5%.
+
+### Teste $H_0: \mu_1 = \mu_2 = \mu_3$
+
+```{r anova}
+summary(ajuste)
+
+tab <- anova(ajuste)
+tab
+```
+
+O p-value é menor que 0.05, então rejeitamos $H_0$, ou seja, há evidência de que as médias não são todas iguais.
+
+## Testes par a par: $H_0^{(il)}: \mu_i = \mu_l$
+
+```{r parapar}
+# Bonferroni (t com variância combinada)
+pairwise.t.test(dados$Pulse, dados$Exer, p.adjust.method = "bonferroni")
+```
+
+Com a correção de Bonferroni, nenhuma das três hipóteses par a par é rejeitada, ou seja, todos os p-values ajustados são maiores que 0.05.
+
+```{r resumo, echo=FALSE}
+pb <- pairwise.t.test(dados$Pulse, dados$Exer, p.adjust.method = "bonferroni")$p.value
+res <- data.frame(
+  Hipotese = c("mu1 = mu2 = mu3",
+               "mu1 = mu2 (None = Some)",
+               "mu1 = mu3 (None = Freq)",
+               "mu2 = mu3 (Some = Freq)"),
+  p_value  = round(c(tab$`Pr(>F)`[1], pb["Some", "None"],
+                     pb["Freq", "None"], pb["Freq", "Some"]), 4)
+)
+res$Decisao <- ifelse(res$p_value <= 0.05, "Rejeita H0", "Não rejeita H0")
+knitr::kable(res, caption = "Decisões ao nível de 5% (pares com correção de Bonferroni)")
+```
+
+Rejeitamos que as três médias são iguais, mas não conseguimos apontar nenhum par de médias diferente. Como $\Theta_0 = \Theta_0^{(12)} \cap \Theta_0^{(13)} \cap \Theta_0^{(23)}$, aceitar todas as hipóteses par a par equivale, logicamente, a aceitar $H_0$, o que contradiz a decisão do teste F.
+
